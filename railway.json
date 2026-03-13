@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "rootDirectory": "server"
+  },
+  "deploy": {
+    "startCommand": "node src/index.js"
+  }
+}
