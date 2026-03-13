@@ -1,0 +1,64 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+  box-shadow: var(--shadow-sm);
+}
+
+.item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.amount {
+  font-weight: 800;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.income { color: var(--color-success); }
+.expense { color: var(--color-danger); }

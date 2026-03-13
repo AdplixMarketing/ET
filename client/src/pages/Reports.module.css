@@ -1,0 +1,118 @@
+.presets {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.preset {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: 2px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-bg);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.preset:hover {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  transform: translateY(-1px);
+}
+
+.dateRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.dateField {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.dateField input {
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.dateField input:hover {
+  border-color: var(--color-primary);
+}
+
+.dateField input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.12);
+  outline: none;
+}
+
+.pnlCard {
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.pnlRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-weight: 500;
+}
+
+.incomeVal { font-weight: 800; color: var(--color-success); font-size: 18px; letter-spacing: -0.3px; }
+.expenseVal { font-weight: 800; color: var(--color-danger); font-size: 18px; letter-spacing: -0.3px; }
+
+.divider {
+  height: 2px;
+  background: var(--color-surface);
+  margin: 8px 0;
+  border-radius: 1px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.2px;
+}
+
+.breakdownRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-surface);
+}
+
+.breakdownRow:last-of-type { border-bottom: none; }
+
+.catDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
+}
+
+.catName { flex: 1; font-size: 14px; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catCount { font-size: 12px; color: var(--color-text-secondary); font-weight: 600; flex-shrink: 0; }
+.catTotal { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+.exportRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  justify-content: center;
+}

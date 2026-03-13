@@ -1,0 +1,132 @@
+.wrapper {
+  text-align: center;
+  padding: 40px 28px;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  animation: cardUp 0.4s ease-out;
+}
+
+@keyframes cardUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.icon {
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+
+.message {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.planToggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.planBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.planBtn:hover {
+  border-color: var(--color-primary);
+}
+
+.planBtnActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.12);
+}
+
+.planName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.planBtnActive .planName {
+  color: var(--color-primary);
+}
+
+.planPrice {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+.planSave {
+  font-size: 11px;
+  font-weight: 800;
+  color: white;
+  background: var(--color-success);
+  padding: 2px 8px;
+  border-radius: 10px;
+  position: absolute;
+  top: -10px;
+  right: -6px;
+}
+
+.planBilled {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.features {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 28px;
+  padding: 0 16px;
+}
+
+.features li {
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  position: relative;
+  padding-left: 28px;
+}
+
+.features li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  color: var(--color-success);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .wrapper { padding: 28px 16px; }
+  .planBtn { padding: 12px 8px; }
+  .planPrice { font-size: 18px; }
+  .features { padding: 0 8px; }
+}

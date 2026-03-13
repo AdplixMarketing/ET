@@ -1,0 +1,111 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.topBar h1 { font-size: 22px; font-weight: 800; flex: 1; letter-spacing: -0.3px; }
+
+.back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 12px;
+  color: var(--color-text);
+  display: flex;
+  transition: all 0.2s;
+}
+
+.back:hover { background: var(--color-surface); }
+
+.status {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.clientName { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+.clientEmail { font-size: 14px; color: var(--color-text-secondary); font-weight: 500; }
+
+.dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.dates div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  min-width: 320px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 0;
+  border-bottom: 2px solid var(--color-surface);
+}
+
+.table th:last-child,
+.table td:last-child {
+  text-align: right;
+}
+
+.table td {
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-surface);
+}
+
+.totals { margin-top: 8px; }
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+@media (max-width: 480px) {
+  .clientName { font-size: 17px; }
+  .actions { gap: 6px; }
+  .actions button { font-size: 13px; }
+  .table th, .table td { font-size: 12px; padding: 8px 4px 8px 0; }
+}

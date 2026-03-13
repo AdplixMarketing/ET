@@ -1,0 +1,240 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import api from '../api/client';
+import toast from 'react-hot-toast';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import styles from './InvoiceForm.module.css';
+
+export default function InvoiceForm() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(id);
+
+  const [form, setForm] = useState({
+    client_name: '',
+    client_email: '',
+    due_date: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+    notes: '',
+    tax_rate: 0,
+  });
+
+  const [items, setItems] = useState([
+    { description: '', quantity: 1, rate: 0 },
+  ]);
+
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (isEdit) {
+      api.get(`/invoices/${id}`).then((res) => {
+        const inv = res.data;
+        setForm({
+          client_name: inv.client_name,
+          client_email: inv.client_email || '',
+          due_date: inv.due_date?.slice(0, 10),
+          notes: inv.notes || '',
+          tax_rate: parseFloat(inv.tax_rate) || 0,
+        });
+        if (inv.items?.length > 0) {
+          setItems(inv.items.map((i) => ({
+            description: i.description,
+            quantity: parseFloat(i.quantity),
+            rate: parseFloat(i.rate),
+          })));
+        }
+      });
+    }
+  }, [id, isEdit]);
+
+  const subtotal = items.reduce((s, i) => s + (i.quantity * i.rate), 0);
+  const taxAmount = subtotal * (form.tax_rate / 100);
+  const total = subtotal + taxAmount;
+
+  const addItem = () => setItems([...items, { description: '', quantity: 1, rate: 0 }]);
+
+  const removeItem = (idx) => {
+    if (items.length <= 1) return;
+    setItems(items.filter((_, i) => i !== idx));
+  };
+
+  const updateItem = (idx, field, value) => {
+    const updated = [...items];
+    updated[idx] = { ...updated[idx], [field]: value };
+    setItems(updated);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.client_name.trim()) {
+      toast.error('Enter client name');
+      return;
+    }
+    if (items.some((i) => !i.description.trim() || i.rate <= 0)) {
+      toast.error('Fill in all line items');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = { ...form, items };
+      if (isEdit) {
+        await api.put(`/invoices/${id}`, payload);
+        toast.success('Invoice updated');
+      } else {
+        const res = await api.post('/invoices', payload);
+        toast.success(`Invoice ${res.data.invoice_number} created`);
+      }
+      navigate('/invoices');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="page">
+      <div className="container">
+        <div className={styles.topBar}>
+          <button className={styles.back} onClick={() => navigate(-1)}>
+            <ArrowLeft size={20} />
+          </button>
+          <h1>{isEdit ? 'Edit Invoice' : 'New Invoice'}</h1>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Client Details</h3>
+            <div className="form-group">
+              <label>Client Name *</label>
+              <input
+                type="text"
+                value={form.client_name}
+                onChange={(e) => setForm({ ...form, client_name: e.target.value })}
+                placeholder="Client or business name"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Client Email</label>
+              <input
+                type="email"
+                value={form.client_email}
+                onChange={(e) => setForm({ ...form, client_email: e.target.value })}
+                placeholder="client@email.com"
+              />
+            </div>
+            <div className="form-group">
+              <label>Due Date</label>
+              <input
+                type="date"
+                value={form.due_date}
+                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+                style={{ padding: '12px 0' }}
+              />
+            </div>
+          </div>
+
+          {/* Line Items */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Line Items</h3>
+
+            {items.map((item, idx) => (
+              <div key={idx} className={styles.lineItem}>
+                <div className="form-group" style={{ flex: 2, marginBottom: 8 }}>
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(e) => updateItem(idx, 'description', e.target.value)}
+                  />
+                </div>
+                <div className={styles.lineNumbers}>
+                  <div className="form-group" style={{ marginBottom: 8, flex: 1, minWidth: 0 }}>
+                    <label style={{ fontSize: 11 }}>Qty</label>
+                    <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      value={item.quantity}
+                      onChange={(e) => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)}
+                      style={{ width: '100%', minWidth: 0 }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 8, flex: 1.4, minWidth: 0 }}>
+                    <label style={{ fontSize: 11 }}>Rate ($)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={item.rate}
+                      onChange={(e) => updateItem(idx, 'rate', parseFloat(e.target.value) || 0)}
+                      style={{ width: '100%', minWidth: 0 }}
+                    />
+                  </div>
+                  <span className={styles.lineTotal}>
+                    ${(item.quantity * item.rate).toFixed(2)}
+                  </span>
+                  {items.length > 1 && (
+                    <button type="button" className={styles.removeBtn} onClick={() => removeItem(idx)}>
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            <button type="button" className="btn btn-outline" onClick={addItem} style={{ marginTop: 8 }}>
+              <Plus size={16} /> Add Item
+            </button>
+          </div>
+
+          {/* Totals */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div className={styles.totalRow}>
+              <span>Subtotal</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
+            <div className={styles.totalRow}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>Tax</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={form.tax_rate}
+                  onChange={(e) => setForm({ ...form, tax_rate: parseFloat(e.target.value) || 0 })}
+                  style={{ width: 60, padding: 6, fontSize: 14 }}
+                />
+                <span>%</span>
+              </div>
+              <span>${taxAmount.toFixed(2)}</span>
+            </div>
+            <div className={styles.totalRow} style={{ fontWeight: 700, fontSize: 20, paddingTop: 12, borderTop: '1px solid var(--color-border)' }}>
+              <span>Total</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Notes</label>
+              <textarea
+                rows={3}
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="Payment terms, thank you note, etc."
+              />
+            </div>
+          </div>
+
+          <button className="btn btn-primary btn-full" disabled={saving}>
+            {saving ? 'Saving...' : isEdit ? 'Update Invoice' : 'Create Invoice'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

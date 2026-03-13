@@ -1,0 +1,80 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.topBar h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+
+.back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 12px;
+  color: var(--color-text);
+  display: flex;
+  transition: all 0.2s;
+}
+
+.back:hover { background: var(--color-surface); }
+
+.lineItem {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--color-surface);
+  animation: cardUp 0.3s ease-out;
+}
+
+@keyframes cardUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lineItem:last-of-type { border-bottom: none; }
+
+.lineNumbers {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lineTotal {
+  font-weight: 800;
+  font-size: 16px;
+  padding-bottom: 12px;
+  min-width: 80px;
+  text-align: right;
+  letter-spacing: -0.3px;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-danger);
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.removeBtn:hover {
+  background: var(--color-danger-light);
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .lineNumbers { gap: 6px; }
+  .lineTotal { font-size: 14px; min-width: 50px; }
+}
