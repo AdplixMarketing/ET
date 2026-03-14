@@ -123,7 +123,7 @@ export default function Settings() {
           {user?.plan === 'pro' ? (
             <div>
               <div className={styles.planBadge}>
-                <Sparkles size={16} /> FlowFi Pro
+                <Sparkles size={16} /> AddFi Pro
               </div>
               {subscription?.subscription && (
                 <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginTop: 8 }}>
@@ -137,7 +137,7 @@ export default function Settings() {
           ) : (
             <div>
               <div className={styles.planBadgeFree}>
-                FlowFi Free
+                AddFi Free
               </div>
               <p style={{ fontSize: 14, marginBottom: 16, marginTop: 12, color: 'var(--color-text-secondary)' }}>
                 Upgrade for unlimited features.

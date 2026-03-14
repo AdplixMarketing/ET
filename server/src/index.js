@@ -110,5 +110,5 @@ app.get('/api/health', (_req, res) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`FlowFi server running on port ${PORT}`);
+  console.log(`AddFi server running on port ${PORT}`);
 });

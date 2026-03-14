@@ -34,7 +34,7 @@ export default function Login() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <h1 className={styles.logo}>FlowFi</h1>
+        <h1 className={styles.logo}>AddFi</h1>
         <p className={styles.subtitle}>Simple financial tracking</p>
 
         <form onSubmit={handleSubmit}>

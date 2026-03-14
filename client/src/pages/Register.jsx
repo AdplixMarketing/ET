@@ -35,7 +35,7 @@ export default function Register() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <h1 className={styles.logo}>FlowFi</h1>
+        <h1 className={styles.logo}>AddFi</h1>
         <p className={styles.subtitle}>Create your account</p>
 
         <form onSubmit={handleSubmit}>

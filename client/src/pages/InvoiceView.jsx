@@ -197,7 +197,7 @@ export default function InvoiceView() {
           {/* Footer */}
           <div className={styles.invoiceFooter}>
             Thank you for your business.
-            <span>Generated with FlowFi</span>
+            <span>Generated with AddFi</span>
           </div>
         </div>
 

@@ -22,8 +22,8 @@ export default function UpgradePrompt({ message }) {
   return (
     <div className={styles.wrapper}>
       <Sparkles size={32} className={styles.icon} />
-      <h3 className={styles.title}>Upgrade to FlowFi Pro</h3>
-      <p className={styles.message}>{message || 'Unlock unlimited features with FlowFi Pro.'}</p>
+      <h3 className={styles.title}>Upgrade to AddFi Pro</h3>
+      <p className={styles.message}>{message || 'Unlock unlimited features with AddFi Pro.'}</p>
 
       <div className={styles.planToggle}>
         <button
@@ -52,7 +52,7 @@ export default function UpgradePrompt({ message }) {
         <li>Advanced reports</li>
       </ul>
       <button className="btn btn-primary btn-full" onClick={handleUpgrade} disabled={loading}>
-        {loading ? 'Loading...' : `Get FlowFi Pro${plan === 'yearly' ? ' Yearly' : ''}`}
+        {loading ? 'Loading...' : `Get AddFi Pro${plan === 'yearly' ? ' Yearly' : ''}`}
       </button>
     </div>
   );

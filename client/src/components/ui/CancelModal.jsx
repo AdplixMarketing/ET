@@ -46,7 +46,7 @@ export default function CancelModal({ onConfirm, onClose }) {
 
             <div className={styles.feedbackGroup}>
               <label className={styles.feedbackLabel}>
-                How can we make FlowFi better?
+                How can we make AddFi better?
               </label>
               <textarea
                 className={styles.feedbackInput}
@@ -59,7 +59,7 @@ export default function CancelModal({ onConfirm, onClose }) {
 
             <div className={styles.actions}>
               <button className="btn btn-primary" style={{ flex: 1 }} onClick={onClose}>
-                Keep FlowFi Pro
+                Keep AddFi Pro
               </button>
               <button
                 className="btn btn-outline"
@@ -90,7 +90,7 @@ export default function CancelModal({ onConfirm, onClose }) {
 
             <div className={styles.actions}>
               <button className="btn btn-primary" style={{ flex: 1 }} onClick={onClose}>
-                Keep FlowFi Pro
+                Keep AddFi Pro
               </button>
               <button
                 className="btn btn-outline"

@@ -176,7 +176,7 @@ export function generateInvoicePDF(invoice, user) {
     doc.fontSize(8).fillColor('#B0B7C3').font('Helvetica')
       .text('Thank you for your business.', 50, footerY + 8, { align: 'center', width: contentWidth });
     doc.fontSize(7).fillColor('#CCD0D7')
-      .text('Generated with FlowFi', 50, footerY + 20, { align: 'center', width: contentWidth });
+      .text('Generated with AddFi', 50, footerY + 20, { align: 'center', width: contentWidth });
 
     doc.end();
   });

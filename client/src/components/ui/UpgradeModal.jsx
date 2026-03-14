@@ -16,7 +16,7 @@ export default function UpgradeModal({ title, message, onClose }) {
             className="btn btn-primary btn-full"
             onClick={() => navigate('/settings')}
           >
-            See FlowFi Pro Plans
+            See AddFi Pro Plans
           </button>
           <button className={styles.dismiss} onClick={onClose}>
             Maybe later

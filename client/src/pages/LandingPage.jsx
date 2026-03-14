@@ -49,12 +49,12 @@ const plans = [
     ],
   },
   {
-    name: 'FlowFi Pro',
+    name: 'AddFi Pro',
     desc: 'For growing businesses',
     price: '$7.99',
     period: '/mo',
     yearly: '$5.99/mo billed yearly',
-    cta: 'Start FlowFi Pro',
+    cta: 'Start AddFi Pro',
     ctaStyle: 'primary',
     pro: true,
     features: [
@@ -101,7 +101,7 @@ export default function LandingPage() {
     <div className={styles.landing}>
       {/* Nav */}
       <nav className={styles.nav}>
-        <div className={styles.navLogo}>FlowFi</div>
+        <div className={styles.navLogo}>AddFi</div>
         <div className={styles.navButtons}>
           <Link to="/login" className={styles.navLogin}>Log In</Link>
           <Link to="/register" className={styles.navSignup}>Sign Up</Link>
@@ -234,7 +234,7 @@ export default function LandingPage() {
         <RevealSection>
           <h2 className={styles.footerCtaTitle}>Ready to simplify your finances?</h2>
           <p className={styles.footerCtaSubtitle}>
-            Join thousands of businesses tracking smarter with FlowFi.
+            Join thousands of businesses tracking smarter with AddFi.
           </p>
           <Link to="/register" className={styles.footerCtaBtn}>
             Get Started Free
@@ -245,7 +245,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        &copy; {new Date().getFullYear()} FlowFi. All rights reserved.
+        &copy; {new Date().getFullYear()} AddFi. All rights reserved.
       </footer>
     </div>
   );
