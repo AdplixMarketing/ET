@@ -46,7 +46,7 @@
 }
 
 .center {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%);
   color: white !important;
   border-radius: 50%;
   width: 56px;
@@ -72,7 +72,7 @@
 }
 
 .center.active {
-  background: linear-gradient(135deg, #357ABD 0%, #2A6298 100%);
+  background: linear-gradient(135deg, #6C5CE7 0%, #2A6298 100%);
   color: white !important;
 }
 

@@ -8,7 +8,7 @@
 
 :root {
   --color-primary: #4A90E2;
-  --color-primary-dark: #357ABD;
+  --color-primary-dark: #6C5CE7;
   --color-primary-light: #EBF3FD;
   --color-bg: #FFFFFF;
   --color-surface: #F0F2F5;
@@ -192,13 +192,13 @@ a:hover { color: var(--color-primary-dark); }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 6px 24px rgba(74, 144, 226, 0.35), 0 0 40px rgba(108, 92, 231, 0.1);
   transform: translateY(-1px);
 }
 
