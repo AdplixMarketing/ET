@@ -132,6 +132,33 @@
   background: var(--color-primary-light);
 }
 
+.receiptPreview {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.receiptImage {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.receiptImage:active {
+  opacity: 0.7;
+}
+
+.receiptHint {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
 @media (max-width: 480px) {
   .amountInput { font-size: 32px; }
   .dollar { font-size: 28px; }

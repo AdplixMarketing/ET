@@ -4,7 +4,7 @@ import { useCategories } from '../hooks/useCategories';
 import { useTransactions } from '../hooks/useTransactions';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, Trash2, Upload, Image, ExternalLink } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import styles from './TransactionForm.module.css';
 
@@ -27,6 +27,7 @@ export default function TransactionForm() {
     notes: '',
   });
   const [receipt, setReceipt] = useState(null);
+  const [existingReceipt, setExistingReceipt] = useState(null);
   const [saving, setSaving] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
@@ -46,6 +47,7 @@ export default function TransactionForm() {
           description: tx.description || '',
           notes: tx.notes || '',
         });
+        if (tx.receipt_path) setExistingReceipt(tx.receipt_path);
       });
     }
   }, [id, isEdit]);
@@ -211,12 +213,23 @@ export default function TransactionForm() {
             />
           </div>
 
-          {/* Receipt Upload */}
+          {/* Receipt */}
           <div className="form-group">
             <label>Receipt</label>
+            {existingReceipt && !receipt && (
+              <div className={styles.receiptPreview}>
+                <img
+                  src={`${import.meta.env.VITE_API_URL || ''}/uploads/${existingReceipt}`}
+                  alt="Receipt"
+                  className={styles.receiptImage}
+                  onClick={() => window.open(`${import.meta.env.VITE_API_URL || ''}/uploads/${existingReceipt}`, '_blank')}
+                />
+                <span className={styles.receiptHint}>Tap to view full size</span>
+              </div>
+            )}
             <label className={styles.uploadBtn}>
               <Upload size={18} />
-              {receipt ? receipt.name : 'Upload receipt image'}
+              {receipt ? receipt.name : existingReceipt ? 'Replace receipt' : 'Upload receipt image'}
               <input
                 type="file"
                 accept="image/*,.pdf"
