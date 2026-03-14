@@ -116,7 +116,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 16px;
+  padding: 14px 16px 18px 14px;
   width: 100%;
   border: 2px dashed var(--color-border);
   border-radius: var(--radius);
