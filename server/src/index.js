@@ -69,4 +69,6 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`FlowFi server running on port ${PORT}`);
+  console.log(`OPENAI_API_KEY set: ${!!process.env.OPENAI_API_KEY}`);
+  console.log(`Env vars available: ${Object.keys(process.env).filter(k => k.startsWith('OPENAI') || k.startsWith('R2') || k.startsWith('STRIPE') || k.startsWith('JWT') || k.startsWith('DATABASE')).join(', ')}`);
 });
