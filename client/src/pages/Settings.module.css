@@ -169,6 +169,21 @@
   color: var(--color-primary);
 }
 
+.cancelLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.cancelLink:hover {
+  opacity: 1;
+  color: var(--color-danger);
+}
+
 @media (max-width: 480px) {
   .themeBtn { padding: 12px 8px; font-size: 12px; }
   .catForm { padding: 12px; gap: 6px; }

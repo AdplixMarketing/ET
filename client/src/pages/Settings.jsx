@@ -3,9 +3,10 @@ import { useAuth } from '../hooks/useAuth';
 import { useCategories } from '../hooks/useCategories';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { LogOut, Plus, Trash2, Edit3, Sparkles, XCircle, Sun, Moon, Monitor } from 'lucide-react';
+import { LogOut, Plus, Trash2, Edit3, Sparkles, Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import UpgradeModal from '../components/ui/UpgradeModal';
+import CancelModal from '../components/ui/CancelModal';
 import styles from './Settings.module.css';
 
 export default function Settings() {
@@ -23,6 +24,7 @@ export default function Settings() {
   const [editingCat, setEditingCat] = useState(null);
   const [catForm, setCatForm] = useState({ name: '', type: 'expense', color: '#4A90E2' });
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
 
   useEffect(() => {
     api.get('/billing/subscription')
@@ -53,11 +55,12 @@ export default function Settings() {
     }
   };
 
-  const handleCancelSub = async () => {
-    if (!confirm('Cancel your FlowFi Pro subscription? You\'ll keep access until the end of your billing period.')) return;
+  const handleCancelSub = async ({ reason, feedback }) => {
     try {
       await api.post('/billing/cancel');
+      console.log('Cancel reason:', reason, '| Feedback:', feedback);
       toast.success('Subscription will cancel at end of billing period');
+      setShowCancel(false);
       const res = await api.get('/billing/subscription');
       setSubscription(res.data);
     } catch {
@@ -129,15 +132,6 @@ export default function Settings() {
                     : `Renews on ${new Date(subscription.subscription.current_period_end).toLocaleDateString()}`
                   }
                 </p>
-              )}
-              {!subscription?.subscription?.cancel_at_period_end && (
-                <button
-                  className="btn btn-outline"
-                  style={{ marginTop: 12, fontSize: 13, padding: '8px 12px' }}
-                  onClick={handleCancelSub}
-                >
-                  <XCircle size={14} /> Cancel Subscription
-                </button>
               )}
             </div>
           ) : (
@@ -298,11 +292,27 @@ export default function Settings() {
           <LogOut size={18} /> Sign Out
         </button>
 
+        {/* Billing — buried at the bottom */}
+        {user?.plan === 'pro' && (!subscription?.subscription || !subscription.subscription.cancel_at_period_end) && (
+          <div style={{ textAlign: 'center', marginTop: 24, paddingBottom: 12 }}>
+            <button className={styles.cancelLink} onClick={() => setShowCancel(true)}>
+              Cancel subscription
+            </button>
+          </div>
+        )}
+
         {showUpgrade && (
           <UpgradeModal
             title="Custom Categories"
             message="Custom categories are a Pro feature. Upgrade to organize your transactions your way."
             onClose={() => setShowUpgrade(false)}
+          />
+        )}
+
+        {showCancel && (
+          <CancelModal
+            onConfirm={handleCancelSub}
+            onClose={() => setShowCancel(false)}
           />
         )}
       </div>

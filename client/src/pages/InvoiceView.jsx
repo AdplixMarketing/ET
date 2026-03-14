@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -16,6 +17,7 @@ const STATUS_COLORS = {
 export default function InvoiceView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -90,72 +92,114 @@ export default function InvoiceView() {
           </span>
         </div>
 
-        {/* Client Info */}
-        <div className="card" style={{ marginBottom: 12 }}>
-          <div className={styles.label}>BILL TO</div>
-          <div className={styles.clientName}>{invoice.client_name}</div>
-          {invoice.client_email && (
-            <div className={styles.clientEmail}>{invoice.client_email}</div>
-          )}
-          <div className={styles.dates}>
-            <div>
-              <span className={styles.label}>ISSUED</span>
-              <span>{format(new Date(invoice.issue_date), 'MMM d, yyyy')}</span>
+        {/* Invoice Card */}
+        <div className={styles.invoiceCard}>
+          <div className={styles.accentBar} />
+          <div className={styles.invoiceBody}>
+            {/* Header */}
+            <div className={styles.invoiceHeader}>
+              <div className={styles.brandSide}>
+                <h2>{user?.business_name || 'My Business'}</h2>
+                <div className={styles.brandEmail}>{user?.email}</div>
+              </div>
+              <div>
+                <div className={styles.invoiceLabel}>INVOICE</div>
+                <div className={styles.invoiceNumber}>{invoice.invoice_number}</div>
+              </div>
             </div>
-            <div>
-              <span className={styles.label}>DUE</span>
-              <span>{format(new Date(invoice.due_date), 'MMM d, yyyy')}</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Line Items */}
-        <div className="card" style={{ marginBottom: 12, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Qty</th>
-                <th>Rate</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoice.items?.map((item, i) => (
-                <tr key={i}>
-                  <td>{item.description}</td>
-                  <td>{item.quantity}</td>
-                  <td>${parseFloat(item.rate).toFixed(2)}</td>
-                  <td>${parseFloat(item.amount).toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <div className={styles.divider} />
 
-          <div className={styles.totals}>
-            <div className={styles.totalRow}>
-              <span>Subtotal</span>
-              <span>${parseFloat(invoice.subtotal).toFixed(2)}</span>
+            {/* Bill To + Dates */}
+            <div className={styles.infoRow}>
+              <div>
+                <div className={styles.label}>BILL TO</div>
+                <div className={styles.clientName}>{invoice.client_name}</div>
+                {invoice.client_email && (
+                  <div className={styles.clientEmail}>{invoice.client_email}</div>
+                )}
+              </div>
+              <div className={styles.datesBlock}>
+                <div className={styles.dateItem}>
+                  <div className={styles.label}>ISSUE DATE</div>
+                  <span className={styles.dateValue}>
+                    {format(new Date(invoice.issue_date), 'MMM d, yyyy')}
+                  </span>
+                </div>
+                <div className={styles.dateItem}>
+                  <div className={styles.label}>DUE DATE</div>
+                  <span className={styles.dateValue}>
+                    {format(new Date(invoice.due_date), 'MMM d, yyyy')}
+                  </span>
+                </div>
+                <div
+                  className={styles.statusBadge}
+                  style={{ background: STATUS_COLORS[invoice.status] }}
+                >
+                  {invoice.status}
+                </div>
+              </div>
             </div>
-            {parseFloat(invoice.tax_rate) > 0 && (
+
+            <div className={styles.divider} />
+
+            {/* Line Items */}
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoice.items?.map((item, i) => (
+                    <tr key={i}>
+                      <td>{item.description}</td>
+                      <td>{item.quantity}</td>
+                      <td>${parseFloat(item.rate).toFixed(2)}</td>
+                      <td>${parseFloat(item.amount).toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Totals */}
+            <div className={styles.totals}>
               <div className={styles.totalRow}>
-                <span>Tax ({invoice.tax_rate}%)</span>
-                <span>${parseFloat(invoice.tax_amount).toFixed(2)}</span>
+                <span>Subtotal</span>
+                <span>${parseFloat(invoice.subtotal).toFixed(2)}</span>
+              </div>
+              {parseFloat(invoice.tax_rate) > 0 && (
+                <div className={styles.totalRow}>
+                  <span>Tax ({invoice.tax_rate}%)</span>
+                  <span>${parseFloat(invoice.tax_amount).toFixed(2)}</span>
+                </div>
+              )}
+              <div className={styles.totalFinal}>
+                <span>Total</span>
+                <span>${parseFloat(invoice.total).toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Notes */}
+            {invoice.notes && (
+              <div className={styles.notesSection}>
+                <div className={styles.label}>NOTES</div>
+                <p className={styles.notesText}>{invoice.notes}</p>
               </div>
             )}
-            <div className={styles.totalRow} style={{ fontWeight: 700, fontSize: 20, borderTop: '1px solid var(--color-border)', paddingTop: 12 }}>
-              <span>Total</span>
-              <span>${parseFloat(invoice.total).toFixed(2)}</span>
-            </div>
+          </div>
+
+          {/* Footer */}
+          <div className={styles.invoiceFooter}>
+            Thank you for your business.
+            <span>Generated with FlowFi</span>
           </div>
         </div>
-
-        {invoice.notes && (
-          <div className="card" style={{ marginBottom: 12 }}>
-            <div className={styles.label}>NOTES</div>
-            <p style={{ fontSize: 14 }}>{invoice.notes}</p>
-          </div>
-        )}
 
         {/* Actions */}
         <div className={styles.actions}>

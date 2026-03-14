@@ -4,17 +4,29 @@
   background: var(--color-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  animation: cardUp 0.4s ease-out;
+  animation: cardUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes cardUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .icon {
   color: var(--color-primary);
   margin-bottom: 16px;
+  animation: iconPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards;
+}
+
+@keyframes iconPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 .title {
@@ -49,12 +61,17 @@
   border-radius: var(--radius);
   background: var(--color-bg);
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
 .planBtn:hover {
   border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.planBtn:active {
+  transform: scale(0.97);
 }
 
 .planBtnActive {
@@ -113,6 +130,24 @@
   font-weight: 600;
   position: relative;
   padding-left: 28px;
+  animation: featureIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.features li:nth-child(1) { animation-delay: 0.1s; }
+.features li:nth-child(2) { animation-delay: 0.15s; }
+.features li:nth-child(3) { animation-delay: 0.2s; }
+.features li:nth-child(4) { animation-delay: 0.25s; }
+.features li:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes featureIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .features li::before {
