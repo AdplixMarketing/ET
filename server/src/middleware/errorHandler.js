@@ -1,6 +1,13 @@
 export default function errorHandler(err, _req, res, _next) {
-  console.error(err.stack);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(err.stack);
+  } else {
+    console.error(err.message);
+  }
+
   res.status(err.status || 500).json({
-    error: err.message || 'Internal server error',
+    error: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
+      : err.message || 'Internal server error',
   });
 }

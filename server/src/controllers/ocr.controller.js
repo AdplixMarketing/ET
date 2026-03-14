@@ -58,7 +58,6 @@ export async function scan(req, res, next) {
       date: ocrResult.date,
       amount: ocrResult.amount,
       suggested_category: suggestedCategory,
-      raw_text: ocrResult.rawText,
       receipt_path: key,
     });
   } catch (err) {

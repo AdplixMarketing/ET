@@ -37,15 +37,15 @@ export async function summary(req, res, next) {
 
 export async function chart(req, res, next) {
   try {
-    const months = parseInt(req.query.months) || 6;
+    const months = Math.min(Math.max(parseInt(req.query.months) || 6, 1), 60);
 
     const result = await pool.query(
       `SELECT date_trunc('month', date) as month, type, COALESCE(SUM(amount), 0) as total
        FROM transactions
-       WHERE user_id = $1 AND date >= NOW() - INTERVAL '${months} months'
+       WHERE user_id = $1 AND date >= NOW() - make_interval(months => $2)
        GROUP BY month, type
        ORDER BY month ASC`,
-      [req.userId]
+      [req.userId, months]
     );
 
     const chartData = {};

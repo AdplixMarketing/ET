@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import rateLimit from 'express-rate-limit';
 
 import authRoutes from './routes/auth.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
@@ -16,6 +17,7 @@ import billingRoutes from './routes/billing.routes.js';
 import invoicesRoutes from './routes/invoices.routes.js';
 import { webhook } from './controllers/billing.controller.js';
 import errorHandler from './middleware/errorHandler.js';
+import authenticate from './middleware/auth.js';
 
 dotenv.config();
 
@@ -23,26 +25,64 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy (Railway/Vercel run behind a proxy)
+app.set('trust proxy', 1);
+
 // Stripe webhook needs raw body (must be before express.json)
 app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), webhook);
 
-// Middleware
-app.use(cors({ origin: true, credentials: true }));
-app.use(helmet());
-app.use(morgan('dev'));
-app.use(express.json());
+// Rate limiters
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-// Serve uploaded files from R2
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many attempts. Please try again in 15 minutes.' },
+});
+
+const ocrLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: 'Too many scans. Please wait a minute.' },
+});
+
+// Middleware
+const allowedOrigins = process.env.CLIENT_URL
+  ? [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:5174']
+  : ['http://localhost:5173', 'http://localhost:5174'];
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
+
+app.use(helmet());
+app.use(generalLimiter);
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(express.json({ limit: '1mb' }));
+
+// Serve uploaded files from R2 (authenticated, user can only access own files)
 import { getFromR2 } from './services/r2.service.js';
 
-app.get('/uploads/:userId/:filename', async (req, res) => {
+app.get('/uploads/:userId/:filename', authenticate, async (req, res) => {
   try {
+    if (String(req.params.userId) !== String(req.userId)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const key = `${req.params.userId}/${req.params.filename}`;
     const data = await getFromR2(key);
     const ext = path.extname(req.params.filename).toLowerCase();
     const mimeMap = { '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.gif': 'image/gif', '.pdf': 'application/pdf' };
     res.set('Content-Type', mimeMap[ext] || 'application/octet-stream');
-    res.set('Cache-Control', 'public, max-age=31536000');
+    res.set('Cache-Control', 'private, max-age=3600');
     res.send(data);
   } catch {
     res.status(404).json({ error: 'File not found' });
@@ -50,18 +90,20 @@ app.get('/uploads/:userId/:filename', async (req, res) => {
 });
 
 // Routes
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/ocr', ocrRoutes);
+app.use('/api/ocr', ocrLimiter, ocrRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/invoices', invoicesRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok' });
 });
 
 // Error handler
