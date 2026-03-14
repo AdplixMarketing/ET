@@ -1,0 +1,11 @@
+{
+  "name": "flowfi",
+  "private": true,
+  "scripts": {
+    "build": "cd server && npm install",
+    "start": "cd server && node src/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
