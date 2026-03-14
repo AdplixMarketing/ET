@@ -60,17 +60,16 @@ export default function ScanReceipt() {
     }
     setSaving(true);
     try {
-      const fd = new FormData();
-      fd.append('type', 'expense');
-      fd.append('amount', result.amount);
-      fd.append('date', result.date);
-      if (result.vendor) fd.append('vendor_or_client', result.vendor);
-      if (result.category_id) fd.append('category_id', result.category_id);
-      if (file) fd.append('receipt', file);
+      const body = {
+        type: 'expense',
+        amount: result.amount,
+        date: result.date,
+      };
+      if (result.vendor) body.vendor_or_client = result.vendor;
+      if (result.category_id) body.category_id = result.category_id;
+      if (result.receipt_path) body.receipt_path = result.receipt_path;
 
-      await api.post('/transactions', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await api.post('/transactions', body);
       toast.success('Expense saved!');
       navigate('/transactions');
     } catch {

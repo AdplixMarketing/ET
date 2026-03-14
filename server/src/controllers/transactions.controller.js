@@ -77,8 +77,8 @@ export async function getOne(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const { type, amount, category_id, date, description, vendor_or_client, payment_method, notes } = req.body;
-    const receipt_path = req.file ? req.file.path : null;
+    const { type, amount, category_id, date, description, vendor_or_client, payment_method, notes, receipt_path: bodyReceiptPath } = req.body;
+    const receipt_path = req.file ? req.file.path : (bodyReceiptPath || null);
 
     const result = await pool.query(
       `INSERT INTO transactions (user_id, type, amount, category_id, date, description, vendor_or_client, payment_method, notes, receipt_path)
