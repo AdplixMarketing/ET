@@ -71,6 +71,11 @@
   display: none;
 }
 
+.center svg {
+  position: relative;
+  left: 1px;
+}
+
 .center.active {
   background: linear-gradient(135deg, #6C5CE7 0%, #2A6298 100%);
   color: white !important;

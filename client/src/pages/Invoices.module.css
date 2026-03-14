@@ -7,11 +7,6 @@
 
 .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
 
-.header button svg {
-  position: relative;
-  left: 1px;
-}
-
 .filters {
   display: flex;
   gap: 8px;
