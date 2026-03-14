@@ -69,6 +69,14 @@
   }
 }
 
+.logoImg {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  margin: 0 auto 12px;
+}
+
 .logo {
   font-size: 32px;
   font-weight: 900;

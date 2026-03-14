@@ -34,6 +34,7 @@ export default function Login() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
+        <img src="/logo-512.png" alt="AddFi" className={styles.logoImg} />
         <h1 className={styles.logo}>AddFi</h1>
         <p className={styles.subtitle}>Simple financial tracking</p>
 

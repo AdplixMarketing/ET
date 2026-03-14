@@ -101,7 +101,10 @@ export default function LandingPage() {
     <div className={styles.landing}>
       {/* Nav */}
       <nav className={styles.nav}>
-        <div className={styles.navLogo}>AddFi</div>
+        <div className={styles.navLogo}>
+          <img src="/logo-512.png" alt="AddFi" className={styles.navLogoImg} />
+          AddFi
+        </div>
         <div className={styles.navButtons}>
           <Link to="/login" className={styles.navLogin}>Log In</Link>
           <Link to="/register" className={styles.navSignup}>Sign Up</Link>

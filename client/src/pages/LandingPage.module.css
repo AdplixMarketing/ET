@@ -35,6 +35,9 @@
 }
 
 .navLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 24px;
   font-weight: 900;
   background: linear-gradient(135deg, #4A90E2, #6C5CE7);
@@ -42,6 +45,12 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.5px;
+}
+
+.navLogoImg {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
 }
 
 .navButtons {

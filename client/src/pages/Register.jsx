@@ -35,6 +35,7 @@ export default function Register() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
+        <img src="/logo-512.png" alt="AddFi" className={styles.logoImg} />
         <h1 className={styles.logo}>AddFi</h1>
         <p className={styles.subtitle}>Create your account</p>
 
