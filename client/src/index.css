@@ -90,7 +90,7 @@ a:hover { color: var(--color-primary-dark); }
 
 .page {
   padding-bottom: calc(var(--nav-height) + 32px);
-  padding-top: 20px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   min-height: 100vh;
   animation: pageIn 0.35s ease-out;
 }
