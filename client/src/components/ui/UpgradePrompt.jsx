@@ -31,16 +31,16 @@ export default function UpgradePrompt({ message }) {
           onClick={() => setPlan('monthly')}
         >
           <span className={styles.planName}>Monthly</span>
-          <span className={styles.planPrice}>$6.99/mo</span>
+          <span className={styles.planPrice}>$7.99/mo</span>
         </button>
         <button
           className={`${styles.planBtn} ${plan === 'yearly' ? styles.planBtnActive : ''}`}
           onClick={() => setPlan('yearly')}
         >
           <span className={styles.planName}>Yearly</span>
-          <span className={styles.planPrice}>$4.99/mo</span>
+          <span className={styles.planPrice}>$5.99/mo</span>
           <span className={styles.planBilled}>billed yearly</span>
-          <span className={styles.planSave}>Save 29%</span>
+          <span className={styles.planSave}>Save 25%</span>
         </button>
       </div>
 

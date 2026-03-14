@@ -51,9 +51,9 @@ const plans = [
   {
     name: 'FlowFi Pro',
     desc: 'For growing businesses',
-    price: '$6.99',
+    price: '$7.99',
     period: '/mo',
-    yearly: '$4.99/mo billed yearly',
+    yearly: '$5.99/mo billed yearly',
     cta: 'Start FlowFi Pro',
     ctaStyle: 'primary',
     pro: true,

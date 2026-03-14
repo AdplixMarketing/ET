@@ -144,15 +144,15 @@ export default function Settings() {
               </p>
               <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
                 <button className="btn btn-primary" style={{ flex: 1, minWidth: 0, padding: '14px 0' }} onClick={() => handleUpgrade('monthly')}>
-                  $6.99/mo
+                  $7.99/mo
                 </button>
                 <button className="btn btn-success" style={{ flex: 1, minWidth: 0, padding: '14px 0', overflow: 'visible', flexDirection: 'column', gap: 2 }} onClick={() => handleUpgrade('yearly')}>
-                  <span>$4.99/mo</span>
+                  <span>$5.99/mo</span>
                   <span style={{ fontSize: 11, opacity: 0.85, fontWeight: 600 }}>billed yearly</span>
                 </button>
               </div>
               <p style={{ textAlign: 'right', fontSize: 12, fontWeight: 700, color: 'var(--color-success)', marginTop: 6 }}>
-                Save 29% with yearly
+                Save 25% with yearly
               </p>
             </div>
           )}
