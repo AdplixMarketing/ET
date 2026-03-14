@@ -12,7 +12,8 @@ export async function scanReceipt(imagePath) {
   const imageBuffer = fs.readFileSync(imagePath);
   const base64Image = imageBuffer.toString('base64');
   const ext = path.extname(imagePath).toLowerCase();
-  const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
+  const mimeMap = { '.png': 'image/png', '.gif': 'image/gif', '.webp': 'image/webp' };
+  const mimeType = mimeMap[ext] || 'image/jpeg';
 
   const response = await getOpenAI().chat.completions.create({
     model: 'gpt-4o-mini',

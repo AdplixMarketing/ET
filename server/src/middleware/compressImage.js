@@ -1,30 +1,49 @@
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
+import { uploadToR2 } from '../services/r2.service.js';
 
 export default async function compressImage(req, _res, next) {
   if (!req.file) return next();
 
   const ext = path.extname(req.file.originalname).toLowerCase();
-  if (!['.jpg', '.jpeg', '.png', '.gif'].includes(ext)) return next();
+  const isImage = ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
 
   try {
-    const outputPath = req.file.path.replace(/\.[^.]+$/, '.webp');
+    let filePath = req.file.path;
+    let contentType = req.file.mimetype;
+    let filename = req.file.filename;
 
-    await sharp(req.file.path)
-      .resize(1200, null, { withoutEnlargement: true, fit: 'inside' })
-      .webp({ quality: 80 })
-      .toFile(outputPath);
+    // Compress images to webp
+    if (isImage) {
+      const outputPath = req.file.path.replace(/\.[^.]+$/, '.webp');
+      await sharp(req.file.path)
+        .resize(1200, null, { withoutEnlargement: true, fit: 'inside' })
+        .webp({ quality: 80 })
+        .toFile(outputPath);
 
-    // Remove original, update req.file to point to compressed version
-    await fs.unlink(req.file.path);
-    req.file.path = outputPath;
-    req.file.filename = path.basename(outputPath);
-    req.file.mimetype = 'image/webp';
+      await fs.unlink(req.file.path);
+      filePath = outputPath;
+      contentType = 'image/webp';
+      filename = path.basename(outputPath);
+    }
+
+    // Upload to R2
+    const key = `${req.userId}/${filename}`;
+    await uploadToR2(filePath, key, contentType);
+
+    // Clean up local file
+    await fs.unlink(filePath);
+
+    // Store the R2 key as the path (not local filesystem path)
+    req.file.path = key;
+    req.file.filename = filename;
+    req.file.mimetype = contentType;
 
     next();
   } catch (err) {
-    // If compression fails, continue with original file
+    console.error('compressImage/R2 upload error:', err);
+    // If R2 fails, keep local file path as fallback
     next();
   }
 }

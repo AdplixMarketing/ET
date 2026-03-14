@@ -32,8 +32,22 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve uploaded files from R2
+import { getFromR2 } from './services/r2.service.js';
+
+app.get('/uploads/:userId/:filename', async (req, res) => {
+  try {
+    const key = `${req.params.userId}/${req.params.filename}`;
+    const data = await getFromR2(key);
+    const ext = path.extname(req.params.filename).toLowerCase();
+    const mimeMap = { '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.gif': 'image/gif', '.pdf': 'application/pdf' };
+    res.set('Content-Type', mimeMap[ext] || 'application/octet-stream');
+    res.set('Cache-Control', 'public, max-age=31536000');
+    res.send(data);
+  } catch {
+    res.status(404).json({ error: 'File not found' });
+  }
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
