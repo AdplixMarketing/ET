@@ -34,6 +34,7 @@ If you cannot find a field, use null. Only return the JSON object, nothing else.
             type: 'image_url',
             image_url: {
               url: `data:${mimeType};base64,${base64Image}`,
+              detail: 'low',
             },
           },
         ],
