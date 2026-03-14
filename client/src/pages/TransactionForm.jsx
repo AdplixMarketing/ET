@@ -89,7 +89,7 @@ export default function TransactionForm() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Delete this transaction?')) return;
+    if (!window.confirm('Delete this transaction?')) return;
     try {
       await deleteTransaction(id);
       toast.success('Deleted');
