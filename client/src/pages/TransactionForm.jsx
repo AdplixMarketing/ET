@@ -28,6 +28,7 @@ export default function TransactionForm() {
   });
   const [receipt, setReceipt] = useState(null);
   const [existingReceipt, setExistingReceipt] = useState(null);
+  const [receiptBlobUrl, setReceiptBlobUrl] = useState(null);
   const [saving, setSaving] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
@@ -47,9 +48,21 @@ export default function TransactionForm() {
           description: tx.description || '',
           notes: tx.notes || '',
         });
-        if (tx.receipt_path) setExistingReceipt(tx.receipt_path);
+        if (tx.receipt_path) {
+          setExistingReceipt(tx.receipt_path);
+          // Fetch receipt image through authenticated API to get a viewable blob URL
+          api.get(`/transactions/${id}/receipt`, { responseType: 'blob' })
+            .then((imgRes) => {
+              setReceiptBlobUrl(URL.createObjectURL(imgRes.data));
+            })
+            .catch(() => {});
+        }
       });
     }
+    return () => {
+      // Clean up blob URL on unmount
+      setReceiptBlobUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+    };
   }, [id, isEdit]);
 
   const handleSubmit = async (e) => {
@@ -216,13 +229,13 @@ export default function TransactionForm() {
           {/* Receipt */}
           <div className="form-group">
             <label>Receipt</label>
-            {existingReceipt && !receipt && (
+            {existingReceipt && !receipt && receiptBlobUrl && (
               <div className={styles.receiptPreview}>
                 <img
-                  src={`${import.meta.env.VITE_API_URL || ''}/uploads/${existingReceipt}`}
+                  src={receiptBlobUrl}
                   alt="Receipt"
                   className={styles.receiptImage}
-                  onClick={() => window.open(`${import.meta.env.VITE_API_URL || ''}/uploads/${existingReceipt}`, '_blank')}
+                  onClick={() => window.open(receiptBlobUrl, '_blank')}
                 />
                 <span className={styles.receiptHint}>Tap to view full size</span>
               </div>
