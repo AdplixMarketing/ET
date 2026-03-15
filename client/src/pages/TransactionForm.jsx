@@ -4,7 +4,7 @@ import { useCategories } from '../hooks/useCategories';
 import { useTransactions } from '../hooks/useTransactions';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Trash2, Upload, Image, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Trash2, Upload, Image, ExternalLink, X } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import styles from './TransactionForm.module.css';
 
@@ -231,25 +231,52 @@ export default function TransactionForm() {
             <label>Receipt</label>
             {existingReceipt && !receipt && receiptBlobUrl && (
               <div className={styles.receiptPreview}>
-                <img
-                  src={receiptBlobUrl}
-                  alt="Receipt"
-                  className={styles.receiptImage}
-                  onClick={() => window.open(receiptBlobUrl, '_blank')}
-                />
+                <div className={styles.receiptWrapper}>
+                  <img
+                    src={receiptBlobUrl}
+                    alt="Receipt"
+                    className={styles.receiptImage}
+                    onClick={() => window.open(receiptBlobUrl, '_blank')}
+                  />
+                  <button
+                    type="button"
+                    className={styles.removeReceipt}
+                    onClick={async () => {
+                      if (!window.confirm('Remove this receipt?')) return;
+                      try {
+                        await api.delete(`/transactions/${id}/receipt`);
+                        URL.revokeObjectURL(receiptBlobUrl);
+                        setReceiptBlobUrl(null);
+                        setExistingReceipt(null);
+                        toast.success('Receipt removed');
+                      } catch {
+                        toast.error('Failed to remove receipt');
+                      }
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
                 <span className={styles.receiptHint}>Tap to view full size</span>
               </div>
             )}
-            <label className={styles.uploadBtn}>
-              <Upload size={18} />
-              {receipt ? receipt.name : existingReceipt ? 'Replace receipt' : 'Upload receipt image'}
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                onChange={(e) => setReceipt(e.target.files[0])}
-                hidden
-              />
-            </label>
+            <div className={styles.uploadRow}>
+              <label className={styles.uploadBtn}>
+                <Upload size={18} />
+                {receipt ? receipt.name : existingReceipt ? 'Replace receipt' : 'Upload receipt image'}
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => setReceipt(e.target.files[0])}
+                  hidden
+                />
+              </label>
+              {receipt && (
+                <button type="button" className={styles.removeNewReceipt} onClick={() => setReceipt(null)}>
+                  <X size={16} />
+                </button>
+              )}
+            </div>
           </div>
 
           <button className="btn btn-primary btn-full" disabled={saving}>

@@ -111,6 +111,31 @@
   border-radius: 50%;
 }
 
+.uploadRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.removeNewReceipt {
+  flex-shrink: 0;
+  width: 44px;
+  border: 2px dashed var(--color-danger);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.removeNewReceipt:hover {
+  background: var(--color-danger-light);
+}
+
 .uploadBtn {
   display: flex;
   align-items: center;
@@ -142,6 +167,34 @@
 .receiptPreview {
   margin-bottom: 12px;
   text-align: center;
+}
+
+.receiptWrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.removeReceipt {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.removeReceipt:hover {
+  background: var(--color-danger);
 }
 
 .receiptImage {

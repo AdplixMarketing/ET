@@ -1,6 +1,6 @@
 import pool from '../config/db.js';
 import path from 'path';
-import { getFromR2 } from '../services/r2.service.js';
+import { getFromR2, deleteFromR2 } from '../services/r2.service.js';
 
 export async function list(req, res, next) {
   try {
@@ -93,6 +93,27 @@ export async function getReceipt(req, res, next) {
     res.set('Content-Type', mimeMap[ext] || 'application/octet-stream');
     res.set('Cache-Control', 'private, max-age=3600');
     res.send(data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteReceipt(req, res, next) {
+  try {
+    const result = await pool.query(
+      'SELECT receipt_path FROM transactions WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.userId]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Transaction not found' });
+    const receiptPath = result.rows[0].receipt_path;
+    if (!receiptPath) return res.status(404).json({ error: 'No receipt attached' });
+
+    await deleteFromR2(receiptPath);
+    await pool.query(
+      'UPDATE transactions SET receipt_path = NULL, updated_at = NOW() WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.userId]
+    );
+    res.json({ message: 'Receipt removed' });
   } catch (err) {
     next(err);
   }
