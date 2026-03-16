@@ -16,20 +16,22 @@ export function BusinessProvider({ children }) {
     try {
       const res = await api.get('/businesses');
       setBusinesses(res.data);
-      if (!currentBusinessId && res.data.length > 0) {
+      setCurrentBusinessId((prev) => {
+        if (prev) return prev;
+        if (res.data.length === 0) return null;
         const stored = localStorage.getItem('businessId');
         const defaultBiz = (stored && res.data.find((b) => b.id === parseInt(stored)))
           || res.data.find((b) => b.id === user.default_business_id)
           || res.data[0];
-        setCurrentBusinessId(defaultBiz.id);
         localStorage.setItem('businessId', defaultBiz.id);
-      }
+        return defaultBiz.id;
+      });
     } catch (err) {
       console.error('Failed to fetch businesses:', err);
     } finally {
       setLoading(false);
     }
-  }, [user, currentBusinessId]);
+  }, [user]);
 
   useEffect(() => {
     fetchBusinesses();

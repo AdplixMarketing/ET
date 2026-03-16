@@ -121,26 +121,57 @@ export async function execute(req, res, next) {
     let skippedCount = 0;
     const errors = [];
 
-    for (let i = 0; i < rows.length; i++) {
-      const txn = rows[i];
-      try {
-        await pool.query(
-          `INSERT INTO transactions (user_id, type, amount, date, description, vendor_or_client, notes)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [
-            req.userId,
-            txn.type || 'expense',
-            txn.amount || 0,
-            txn.date || new Date().toISOString().split('T')[0],
-            txn.description || '',
-            txn.vendor_or_client || null,
-            txn.notes || null,
-          ]
-        );
-        importedCount++;
-      } catch (err) {
-        skippedCount++;
-        errors.push({ row: i + 1, error: err.message });
+    // Batch insert in chunks of 50 for performance
+    const BATCH_SIZE = 50;
+    for (let batch = 0; batch < rows.length; batch += BATCH_SIZE) {
+      const chunk = rows.slice(batch, batch + BATCH_SIZE);
+      const values = [];
+      const params = [];
+      let paramIdx = 1;
+
+      for (let i = 0; i < chunk.length; i++) {
+        const txn = chunk[i];
+        try {
+          const amt = parseFloat(txn.amount) || 0;
+          const date = txn.date || new Date().toISOString().split('T')[0];
+          if (amt === 0) {
+            skippedCount++;
+            errors.push({ row: batch + i + 1, error: 'Invalid amount' });
+            continue;
+          }
+          values.push(`($${paramIdx++}, $${paramIdx++}, $${paramIdx++}, $${paramIdx++}, $${paramIdx++}, $${paramIdx++}, $${paramIdx++})`);
+          params.push(req.userId, txn.type || 'expense', amt, date, txn.description || '', txn.vendor_or_client || null, txn.notes || null);
+        } catch (err) {
+          skippedCount++;
+          errors.push({ row: batch + i + 1, error: err.message });
+        }
+      }
+
+      if (values.length > 0) {
+        try {
+          const result = await pool.query(
+            `INSERT INTO transactions (user_id, type, amount, date, description, vendor_or_client, notes)
+             VALUES ${values.join(', ')}`,
+            params
+          );
+          importedCount += result.rowCount;
+        } catch (err) {
+          // Fall back to individual inserts for this batch to identify bad rows
+          for (let i = 0; i < chunk.length; i++) {
+            const txn = chunk[i];
+            try {
+              await pool.query(
+                `INSERT INTO transactions (user_id, type, amount, date, description, vendor_or_client, notes)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [req.userId, txn.type || 'expense', parseFloat(txn.amount) || 0, txn.date || new Date().toISOString().split('T')[0], txn.description || '', txn.vendor_or_client || null, txn.notes || null]
+              );
+              importedCount++;
+            } catch (rowErr) {
+              skippedCount++;
+              errors.push({ row: batch + i + 1, error: rowErr.message });
+            }
+          }
+        }
       }
     }
 

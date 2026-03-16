@@ -10,7 +10,10 @@ const PRO_LIMITS = {
   receipt_scans_per_month: 80,
 };
 
-async function getUserPlan(userId) {
+async function getUserPlan(userId, req) {
+  // Cache per-request to avoid multiple DB hits
+  if (req?.userPlan) return req.userPlan;
+
   const result = await pool.query(
     'SELECT plan, plan_expires_at FROM users WHERE id = $1',
     [userId]
@@ -18,26 +21,30 @@ async function getUserPlan(userId) {
   if (result.rows.length === 0) return 'free';
   const user = result.rows[0];
   if ((user.plan === 'pro' || user.plan === 'max') && user.plan_expires_at && new Date(user.plan_expires_at) < new Date()) {
-    return 'free'; // Expired
+    return 'free';
   }
   return user.plan;
 }
 
 async function getMonthlyCount(userId) {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
   const result = await pool.query(
     `SELECT COUNT(*) FROM transactions
-     WHERE user_id = $1 AND date_trunc('month', created_at) = date_trunc('month', NOW())`,
-    [userId]
+     WHERE user_id = $1 AND created_at >= $2`,
+    [userId, startOfMonth]
   );
   return parseInt(result.rows[0].count);
 }
 
 async function getMonthlyScanCount(userId) {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
   const result = await pool.query(
     `SELECT COUNT(*) FROM transactions
      WHERE user_id = $1 AND receipt_path IS NOT NULL
-     AND date_trunc('month', created_at) = date_trunc('month', NOW())`,
-    [userId]
+     AND created_at >= $2`,
+    [userId, startOfMonth]
   );
   return parseInt(result.rows[0].count);
 }
@@ -50,7 +57,7 @@ function getLimitsForPlan(plan) {
 
 // Middleware: require Pro or Max plan
 export function requirePro(req, res, next) {
-  getUserPlan(req.userId).then((plan) => {
+  getUserPlan(req.userId, req).then((plan) => {
     if (plan !== 'pro' && plan !== 'max') {
       return res.status(403).json({
         error: 'Pro plan required',
@@ -64,7 +71,7 @@ export function requirePro(req, res, next) {
 
 // Middleware: require Max plan
 export function requireMax(req, res, next) {
-  getUserPlan(req.userId).then((plan) => {
+  getUserPlan(req.userId, req).then((plan) => {
     if (plan !== 'max') {
       return res.status(403).json({
         error: 'AddFi Max plan required',
@@ -79,7 +86,7 @@ export function requireMax(req, res, next) {
 
 // Middleware: check transaction limit
 export function checkTransactionLimit(req, res, next) {
-  getUserPlan(req.userId).then(async (plan) => {
+  getUserPlan(req.userId, req).then(async (plan) => {
     req.userPlan = plan;
     const limits = getLimitsForPlan(plan);
     if (limits.transactions_per_month === Infinity) return next();
@@ -100,7 +107,7 @@ export function checkTransactionLimit(req, res, next) {
 
 // Middleware: check receipt scan limit
 export function checkScanLimit(req, res, next) {
-  getUserPlan(req.userId).then(async (plan) => {
+  getUserPlan(req.userId, req).then(async (plan) => {
     req.userPlan = plan;
     const limits = getLimitsForPlan(plan);
     if (limits.receipt_scans_per_month === Infinity) return next();
@@ -121,7 +128,7 @@ export function checkScanLimit(req, res, next) {
 
 // Middleware: check custom category (free = defaults only)
 export function checkCategoryLimit(req, res, next) {
-  getUserPlan(req.userId).then((plan) => {
+  getUserPlan(req.userId, req).then((plan) => {
     req.userPlan = plan;
     if (plan === 'pro' || plan === 'max') return next();
     return res.status(403).json({

@@ -24,14 +24,22 @@ export async function exportData(req, res, next) {
       ),
     ]);
 
-    // Get invoice items for each invoice
+    // Batch-fetch all invoice items in one query
     const invoices = invoicesResult.rows;
-    for (const inv of invoices) {
-      const items = await pool.query(
-        'SELECT description, quantity, rate, amount, sort_order FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order',
-        [inv.id]
+    if (invoices.length > 0) {
+      const invoiceIds = invoices.map((inv) => inv.id);
+      const allItems = await pool.query(
+        'SELECT invoice_id, description, quantity, rate, amount, sort_order FROM invoice_items WHERE invoice_id = ANY($1) ORDER BY invoice_id, sort_order',
+        [invoiceIds]
       );
-      inv.items = items.rows;
+      const itemsByInvoice = {};
+      for (const item of allItems.rows) {
+        if (!itemsByInvoice[item.invoice_id]) itemsByInvoice[item.invoice_id] = [];
+        itemsByInvoice[item.invoice_id].push(item);
+      }
+      for (const inv of invoices) {
+        inv.items = itemsByInvoice[inv.id] || [];
+      }
     }
 
     const exportData = {

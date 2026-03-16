@@ -31,13 +31,21 @@ export async function list(req, res, next) {
 
     const result = await pool.query(query, params);
 
-    // Get items for each invoice
-    for (const invoice of result.rows) {
-      const items = await pool.query(
-        'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order',
-        [invoice.id]
+    // Batch-fetch all items in one query instead of N+1
+    if (result.rows.length > 0) {
+      const invoiceIds = result.rows.map((inv) => inv.id);
+      const itemsResult = await pool.query(
+        `SELECT * FROM invoice_items WHERE invoice_id = ANY($1) ORDER BY invoice_id, sort_order`,
+        [invoiceIds]
       );
-      invoice.items = items.rows;
+      const itemsByInvoice = {};
+      for (const item of itemsResult.rows) {
+        if (!itemsByInvoice[item.invoice_id]) itemsByInvoice[item.invoice_id] = [];
+        itemsByInvoice[item.invoice_id].push(item);
+      }
+      for (const invoice of result.rows) {
+        invoice.items = itemsByInvoice[invoice.id] || [];
+      }
     }
 
     res.json(result.rows);
@@ -55,11 +63,10 @@ export async function getOne(req, res, next) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'Invoice not found' });
 
     const invoice = result.rows[0];
-    const items = await pool.query(
-      'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order',
-      [invoice.id]
-    );
-    invoice.items = items.rows;
+    const [itemsResult] = await Promise.all([
+      pool.query('SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order', [invoice.id]),
+    ]);
+    invoice.items = itemsResult.rows;
 
     res.json(invoice);
   } catch (err) {
@@ -353,16 +360,11 @@ export async function downloadPDF(req, res, next) {
     if (invoiceResult.rows.length === 0) return res.status(404).json({ error: 'Invoice not found' });
 
     const invoice = invoiceResult.rows[0];
-    const items = await pool.query(
-      'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order',
-      [invoice.id]
-    );
-    invoice.items = items.rows;
-
-    const userResult = await pool.query(
-      'SELECT business_name, email, business_address, business_phone, currency FROM users WHERE id = $1',
-      [req.userId]
-    );
+    const [itemsRes, userResult] = await Promise.all([
+      pool.query('SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order', [invoice.id]),
+      pool.query('SELECT business_name, email, business_address, business_phone, currency FROM users WHERE id = $1', [req.userId]),
+    ]);
+    invoice.items = itemsRes.rows;
     const user = userResult.rows[0];
 
     const pdfBuffer = await generateInvoicePDF(invoice, user);

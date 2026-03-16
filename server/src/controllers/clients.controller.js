@@ -40,30 +40,28 @@ export async function getOne(req, res, next) {
 
     const client = result.rows[0];
 
-    // Get invoices for this client
-    const invoices = await pool.query(
-      `SELECT id, invoice_number, status, total, issue_date, due_date, paid_date
-       FROM invoices WHERE client_id = $1 AND user_id = $2 ORDER BY created_at DESC`,
-      [client.id, req.userId]
-    );
+    // Parallel fetch invoices, transactions, and stats
+    const [invoices, transactions, stats] = await Promise.all([
+      pool.query(
+        `SELECT id, invoice_number, status, total, issue_date, due_date, paid_date
+         FROM invoices WHERE client_id = $1 AND user_id = $2 ORDER BY created_at DESC`,
+        [client.id, req.userId]
+      ),
+      pool.query(
+        `SELECT t.id, t.type, t.amount, t.date, t.description, t.vendor_or_client, c.name as category_name
+         FROM transactions t
+         LEFT JOIN categories c ON t.category_id = c.id
+         WHERE t.client_id = $1 AND t.user_id = $2 ORDER BY t.date DESC LIMIT 20`,
+        [client.id, req.userId]
+      ),
+      pool.query(
+        `SELECT COALESCE(SUM(total), 0) as total_revenue, COUNT(*) as invoice_count
+         FROM invoices WHERE client_id = $1 AND user_id = $2`,
+        [client.id, req.userId]
+      ),
+    ]);
     client.invoices = invoices.rows;
-
-    // Get transactions for this client
-    const transactions = await pool.query(
-      `SELECT t.id, t.type, t.amount, t.date, t.description, t.vendor_or_client, c.name as category_name
-       FROM transactions t
-       LEFT JOIN categories c ON t.category_id = c.id
-       WHERE t.client_id = $1 AND t.user_id = $2 ORDER BY t.date DESC LIMIT 20`,
-      [client.id, req.userId]
-    );
     client.transactions = transactions.rows;
-
-    // Revenue stats
-    const stats = await pool.query(
-      `SELECT COALESCE(SUM(total), 0) as total_revenue, COUNT(*) as invoice_count
-       FROM invoices WHERE client_id = $1 AND user_id = $2`,
-      [client.id, req.userId]
-    );
     client.stats = stats.rows[0];
 
     res.json(client);
