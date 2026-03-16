@@ -53,6 +53,7 @@ export default function Reports() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [upgradeType, setUpgradeType] = useState('export');
 
   useEffect(() => {
     setLoading(true);
@@ -74,6 +75,7 @@ export default function Reports() {
       toast.success(`${format.toUpperCase()} downloaded`);
     } catch (err) {
       if (err.response?.status === 403) {
+        setUpgradeType('export');
         setShowUpgrade(true);
       } else {
         toast.error('Export failed');
@@ -115,7 +117,7 @@ export default function Reports() {
             <button
               className={styles.preset}
               style={{ padding: '8px 14px', whiteSpace: 'nowrap', color: '#FF9500', fontSize: 12 }}
-              onClick={() => setShowUpgrade(true)}
+              onClick={() => { setUpgradeType('max'); setShowUpgrade(true); }}
             >
               <Crown size={12} /> More with Max
             </button>
@@ -261,8 +263,11 @@ export default function Reports() {
 
         {showUpgrade && (
           <UpgradeModal
-            title="Export with Pro"
-            message="Exporting reports as CSV and PDF is a Pro feature. Upgrade to download your data anytime."
+            title={upgradeType === 'max' ? 'Advanced Reports' : 'Export with Pro'}
+            message={upgradeType === 'max'
+              ? 'Upgrade to AddFi Max to unlock Cash Flow tracking, Tax Summaries, Expense Trends, Revenue by Client, and Period Comparisons — everything you need to understand your business at a deeper level.'
+              : 'Exporting reports as CSV and PDF is a Pro feature. Upgrade to download your data anytime.'}
+            tier={upgradeType === 'max' ? 'max' : 'pro'}
             onClose={() => setShowUpgrade(false)}
           />
         )}
