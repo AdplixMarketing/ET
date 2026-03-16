@@ -1,5 +1,5 @@
 .skeleton {
-  background: var(--color-bg-secondary, #f0f0f0);
+  background: var(--color-surface);
   position: relative;
   overflow: hidden;
 }
@@ -14,7 +14,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.15) 50%,
+    var(--color-surface-hover) 50%,
     transparent 100%
   );
   animation: shimmer 1.5s infinite;
