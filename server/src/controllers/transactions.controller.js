@@ -1,6 +1,7 @@
 import pool from '../config/db.js';
 import path from 'path';
 import { getFromR2, deleteFromR2 } from '../services/r2.service.js';
+import { runAutoCategorize, checkDuplicate } from '../services/automation.service.js';
 
 export async function list(req, res, next) {
   try {
@@ -124,12 +125,27 @@ export async function create(req, res, next) {
     const { type, amount, category_id, date, description, vendor_or_client, payment_method, notes, receipt_path: bodyReceiptPath } = req.body;
     const receipt_path = req.file ? req.file.path : (bodyReceiptPath || null);
 
+    // Auto-categorize if no category provided
+    let finalCategoryId = category_id || null;
+    if (!finalCategoryId) {
+      const autoCategory = await runAutoCategorize(req.userId, { vendor_or_client, description });
+      if (autoCategory) finalCategoryId = autoCategory;
+    }
+
+    // Check for duplicates
+    const duplicates = await checkDuplicate(req.userId, { amount, date, vendor_or_client });
+
     const result = await pool.query(
       `INSERT INTO transactions (user_id, type, amount, category_id, date, description, vendor_or_client, payment_method, notes, receipt_path)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [req.userId, type, amount, category_id || null, date, description || null, vendor_or_client || null, payment_method || null, notes || null, receipt_path]
+      [req.userId, type, amount, finalCategoryId, date, description || null, vendor_or_client || null, payment_method || null, notes || null, receipt_path]
     );
-    res.status(201).json(result.rows[0]);
+
+    const response = result.rows[0];
+    if (duplicates.length > 0) {
+      response.duplicate_warning = { message: 'Potential duplicate detected', matches: duplicates };
+    }
+    res.status(201).json(response);
   } catch (err) {
     next(err);
   }

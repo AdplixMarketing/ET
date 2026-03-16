@@ -22,9 +22,18 @@ export function generateInvoicePDF(invoice, user) {
     doc.fontSize(22).fillColor('#1C1C1E')
       .text(user.business_name || 'My Business', 50, headerY);
 
-    // Business email
-    doc.fontSize(9).fillColor('#8E8E93')
-      .text(user.email, 50, headerY + 28);
+    // Business details
+    let detailY = headerY + 28;
+    doc.fontSize(9).fillColor('#8E8E93');
+    if (user.business_address) {
+      doc.text(user.business_address, 50, detailY);
+      detailY += 14;
+    }
+    if (user.business_phone) {
+      doc.text(user.business_phone, 50, detailY);
+      detailY += 14;
+    }
+    doc.text(user.email, 50, detailY);
 
     // INVOICE label + number (right side)
     doc.fontSize(32).fillColor('#4A90E2')

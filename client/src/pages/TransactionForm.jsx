@@ -4,9 +4,10 @@ import { useCategories } from '../hooks/useCategories';
 import { useTransactions } from '../hooks/useTransactions';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Trash2, Upload, Image, ExternalLink, X } from 'lucide-react';
+import { ArrowLeft, Trash2, Upload, Image, ExternalLink, X, AlertTriangle } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import styles from './TransactionForm.module.css';
+import { format } from 'date-fns';
 
 const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check', 'Other'];
 
@@ -31,6 +32,7 @@ export default function TransactionForm() {
   const [receiptBlobUrl, setReceiptBlobUrl] = useState(null);
   const [saving, setSaving] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const { categories } = useCategories(type);
 
@@ -90,6 +92,10 @@ export default function TransactionForm() {
       } else {
         await api.post('/transactions', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('Transaction added');
+        if (res.data.duplicate_warning) {
+          setDuplicateWarning(res.data.duplicate_warning);
+          return;
+        }
       }
       navigate(-1);
     } catch (err) {
@@ -283,6 +289,26 @@ export default function TransactionForm() {
             {saving ? 'Saving...' : isEdit ? 'Update Transaction' : 'Save Transaction'}
           </button>
         </form>
+
+        {duplicateWarning && (
+          <div style={{ margin: '16px 0', padding: 12, background: 'rgba(255, 149, 0, 0.1)', border: '1px solid #FF9500', borderRadius: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <AlertTriangle size={16} style={{ color: '#FF9500' }} />
+              <span style={{ fontWeight: 600, fontSize: 14, color: '#FF9500' }}>Possible duplicate</span>
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>
+              Transaction saved, but similar entries exist:
+            </p>
+            {duplicateWarning.matches.map((d) => (
+              <div key={d.id} style={{ fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--color-border)' }}>
+                ${parseFloat(d.amount).toFixed(2)} &middot; {d.vendor_or_client || 'Unknown'} &middot; {format(new Date(d.date), 'MMM d, yyyy')}
+              </div>
+            ))}
+            <button className="btn btn-outline" style={{ marginTop: 8, fontSize: 12, padding: '6px 12px' }} onClick={() => { setDuplicateWarning(null); navigate(-1); }}>
+              Dismiss & Go Back
+            </button>
+          </div>
+        )}
 
         {showUpgrade && (
           <UpgradeModal

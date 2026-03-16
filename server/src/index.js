@@ -15,9 +15,21 @@ import ocrRoutes from './routes/ocr.routes.js';
 import reportsRoutes from './routes/reports.routes.js';
 import billingRoutes from './routes/billing.routes.js';
 import invoicesRoutes from './routes/invoices.routes.js';
+import dataRoutes from './routes/data.routes.js';
+import usageRoutes from './routes/usage.routes.js';
+import clientsRoutes from './routes/clients.routes.js';
+import connectRoutes from './routes/connect.routes.js';
+import templatesRoutes from './routes/templates.routes.js';
+import portalRoutes from './routes/portal.routes.js';
+import businessesRoutes from './routes/businesses.routes.js';
+import automationRoutes from './routes/automation.routes.js';
+import recurringRoutes from './routes/recurring.routes.js';
+import importsRoutes from './routes/imports.routes.js';
 import { webhook } from './controllers/billing.controller.js';
 import errorHandler from './middleware/errorHandler.js';
 import authenticate from './middleware/auth.js';
+import { startInvoiceOverdueJob } from './jobs/invoiceOverdue.js';
+import { startRecurringProcessor } from './jobs/recurringProcessor.js';
 
 dotenv.config();
 
@@ -92,6 +104,8 @@ app.get('/uploads/:userId/:filename', authenticate, async (req, res) => {
 // Routes
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/forgot-password', authLimiter);
+app.use('/api/auth/reset-password', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/transactions', transactionsRoutes);
@@ -100,6 +114,16 @@ app.use('/api/ocr', ocrLimiter, ocrRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/invoices', invoicesRoutes);
+app.use('/api/data', dataRoutes);
+app.use('/api/usage', usageRoutes);
+app.use('/api/clients', clientsRoutes);
+app.use('/api/connect', connectRoutes);
+app.use('/api/templates', templatesRoutes);
+app.use('/api/portal', portalRoutes);
+app.use('/api/businesses', businessesRoutes);
+app.use('/api/automation', automationRoutes);
+app.use('/api/recurring', recurringRoutes);
+app.use('/api/imports', importsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -111,4 +135,6 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`AddFi server running on port ${PORT}`);
+  startInvoiceOverdueJob();
+  startRecurringProcessor();
 });

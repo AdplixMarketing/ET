@@ -5,17 +5,53 @@ import { useAuth } from '../hooks/useAuth';
 import SummaryCards from '../components/dashboard/SummaryCards';
 import MonthlyChart from '../components/dashboard/MonthlyChart';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
-import { Plus, Camera } from 'lucide-react';
+import Skeleton from '../components/ui/Skeleton';
+import { Plus, Camera, RefreshCw, AlertTriangle } from 'lucide-react';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
-  const { summary, chartData, recent, loading, fetch } = useDashboard();
+  const { summary, chartData, recent, loading, error, fetch } = useDashboard();
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => { fetch(); }, [fetch]);
 
-  if (loading) return <div className="spinner" />;
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="container">
+          <Skeleton height={32} width="60%" style={{ marginBottom: 8 }} />
+          <Skeleton height={16} width="30%" style={{ marginBottom: 24 }} />
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+            <Skeleton height={80} style={{ flex: 1, borderRadius: 12 }} />
+            <Skeleton height={80} style={{ flex: 1, borderRadius: 12 }} />
+            <Skeleton height={80} style={{ flex: 1, borderRadius: 12 }} />
+          </div>
+          <Skeleton height={200} style={{ borderRadius: 12, marginBottom: 16 }} />
+          <Skeleton height={16} width="40%" style={{ marginBottom: 12 }} />
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} height={52} style={{ borderRadius: 8, marginBottom: 8 }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page">
+        <div className="container">
+          <div className="card" style={{ textAlign: 'center', padding: 32 }}>
+            <AlertTriangle size={40} style={{ color: 'var(--color-danger)', marginBottom: 12 }} />
+            <p style={{ fontSize: 15, marginBottom: 16 }}>{error}</p>
+            <button className="btn btn-primary" onClick={() => fetch()}>
+              <RefreshCw size={16} /> Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page">

@@ -1,5 +1,9 @@
+import crypto from 'crypto';
 import pool from '../config/db.js';
 import { generateInvoicePDF } from '../services/invoice.service.js';
+import { sendEmail } from '../services/email.service.js';
+import { invoiceEmailTemplate } from '../templates/invoiceEmail.js';
+import { auditLog } from '../services/audit.service.js';
 
 async function getNextInvoiceNumber(userId) {
   const result = await pool.query(
@@ -68,7 +72,7 @@ export async function create(req, res, next) {
   try {
     await client.query('BEGIN');
 
-    const { client_name, client_email, due_date, notes, tax_rate = 0, items = [] } = req.body;
+    const { client_name, client_email, client_id, due_date, notes, tax_rate = 0, items = [] } = req.body;
     const invoice_number = await getNextInvoiceNumber(req.userId);
 
     // Calculate totals
@@ -76,10 +80,24 @@ export async function create(req, res, next) {
     const tax_amount = subtotal * (tax_rate / 100);
     const total = subtotal + tax_amount;
 
+    // If client_id provided, auto-populate name/email from client record
+    let finalClientName = client_name;
+    let finalClientEmail = client_email;
+    if (client_id) {
+      const clientResult = await client.query(
+        'SELECT name, email FROM clients WHERE id = $1 AND user_id = $2',
+        [client_id, req.userId]
+      );
+      if (clientResult.rows.length > 0) {
+        finalClientName = finalClientName || clientResult.rows[0].name;
+        finalClientEmail = finalClientEmail || clientResult.rows[0].email;
+      }
+    }
+
     const invoiceResult = await client.query(
-      `INSERT INTO invoices (user_id, invoice_number, client_name, client_email, due_date, notes, subtotal, tax_rate, tax_amount, total)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [req.userId, invoice_number, client_name, client_email || null, due_date, notes || null, subtotal, tax_rate, tax_amount, total]
+      `INSERT INTO invoices (user_id, invoice_number, client_name, client_email, client_id, due_date, notes, subtotal, tax_rate, tax_amount, total)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [req.userId, invoice_number, finalClientName, finalClientEmail || null, client_id || null, due_date, notes || null, subtotal, tax_rate, tax_amount, total]
     );
     const invoice = invoiceResult.rows[0];
 
@@ -187,12 +205,71 @@ export async function update(req, res, next) {
 
 export async function markSent(req, res, next) {
   try {
-    const result = await pool.query(
-      `UPDATE invoices SET status = 'sent', updated_at = NOW()
-       WHERE id = $1 AND user_id = $2 AND status = 'draft' RETURNING *`,
+    const invoiceResult = await pool.query(
+      `SELECT * FROM invoices WHERE id = $1 AND user_id = $2 AND status = 'draft'`,
       [req.params.id, req.userId]
     );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Invoice not found or already sent' });
+    if (invoiceResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Invoice not found or already sent' });
+    }
+
+    const invoice = invoiceResult.rows[0];
+
+    // Get user info for PDF and email
+    const userResult = await pool.query(
+      'SELECT business_name, email, currency FROM users WHERE id = $1',
+      [req.userId]
+    );
+    const user = userResult.rows[0];
+
+    // If client has email, send the invoice
+    if (invoice.client_email) {
+      const items = await pool.query(
+        'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order',
+        [invoice.id]
+      );
+      invoice.items = items.rows;
+
+      const pdfBuffer = await generateInvoicePDF(invoice, user);
+
+      await sendEmail({
+        to: invoice.client_email,
+        subject: `Invoice ${invoice.invoice_number} from ${user.business_name || 'AddFi'}`,
+        html: invoiceEmailTemplate({
+          invoiceNumber: invoice.invoice_number,
+          clientName: invoice.client_name,
+          businessName: user.business_name || 'My Business',
+          total: invoice.total,
+          dueDate: invoice.due_date,
+          currency: user.currency,
+        }),
+        attachments: [{
+          content: pdfBuffer.toString('base64'),
+          filename: `${invoice.invoice_number}.pdf`,
+          type: 'application/pdf',
+          disposition: 'attachment',
+        }],
+      });
+    }
+
+    // Generate portal token for online viewing/payment
+    const portalToken = crypto.randomBytes(32).toString('hex');
+    const portalExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+    // Mark as sent
+    const result = await pool.query(
+      `UPDATE invoices SET status = 'sent', portal_token = $1, portal_expires_at = $2, updated_at = NOW()
+       WHERE id = $3 RETURNING *`,
+      [portalToken, portalExpires, req.params.id]
+    );
+
+    await auditLog(req.userId, 'invoice_sent', {
+      entityType: 'invoice',
+      entityId: invoice.id,
+      req,
+      metadata: { invoice_number: invoice.invoice_number, client_email: invoice.client_email },
+    });
+
     res.json(result.rows[0]);
   } catch (err) {
     next(err);
@@ -248,6 +325,13 @@ export async function markPaid(req, res, next) {
 
     await client.query('COMMIT');
 
+    await auditLog(req.userId, 'invoice_paid', {
+      entityType: 'invoice',
+      entityId: req.params.id,
+      req,
+      metadata: { invoice_number: invoice.invoice_number, amount: invoice.total },
+    });
+
     res.json({
       message: 'Invoice marked as paid',
       transaction_id: txResult.rows[0].id,
@@ -276,7 +360,7 @@ export async function downloadPDF(req, res, next) {
     invoice.items = items.rows;
 
     const userResult = await pool.query(
-      'SELECT business_name, email FROM users WHERE id = $1',
+      'SELECT business_name, email, business_address, business_phone, currency FROM users WHERE id = $1',
       [req.userId]
     );
     const user = userResult.rows[0];

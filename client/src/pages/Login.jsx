@@ -74,6 +74,9 @@ export default function Login() {
         </form>
 
         <p className={styles.link}>
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
+        <p className={styles.link}>
           Don't have an account? <Link to="/register">Sign up</Link>
         </p>
       </div>

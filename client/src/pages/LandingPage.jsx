@@ -39,13 +39,13 @@ const plans = [
     yearly: null,
     cta: 'Start Free',
     ctaStyle: 'outline',
-    pro: false,
+    tier: null,
     features: [
       { text: '15 transactions / month', ok: true },
       { text: '5 receipt scans / month', ok: true },
       { text: 'Basic reports', ok: true },
-      { text: 'Unlimited invoices', ok: false },
-      { text: 'Priority support', ok: false },
+      { text: 'Invoicing', ok: false },
+      { text: 'Custom categories', ok: false },
     ],
   },
   {
@@ -56,13 +56,30 @@ const plans = [
     yearly: '$5.99/mo billed yearly',
     cta: 'Start AddFi Pro',
     ctaStyle: 'primary',
-    pro: true,
+    tier: 'pro',
     features: [
-      { text: 'Unlimited transactions', ok: true },
-      { text: 'Unlimited receipt scans', ok: true },
-      { text: 'Advanced reports', ok: true },
+      { text: '200 transactions / month', ok: true },
+      { text: '80 receipt scans / month', ok: true },
+      { text: 'Reports with export', ok: true },
       { text: 'Unlimited invoices', ok: true },
-      { text: 'Priority support', ok: true },
+      { text: 'Custom categories', ok: true },
+    ],
+  },
+  {
+    name: 'AddFi Max',
+    desc: 'For scaling businesses',
+    price: '$79',
+    period: '/mo',
+    yearly: '$59/mo billed yearly',
+    cta: 'Start AddFi Max',
+    ctaStyle: 'primary',
+    tier: 'max',
+    features: [
+      { text: 'Unlimited everything', ok: true },
+      { text: 'Client database', ok: true },
+      { text: 'Custom invoice templates', ok: true },
+      { text: 'Client payment portal', ok: true },
+      { text: 'Advanced analytics', ok: true },
     ],
   },
 ];
@@ -191,9 +208,9 @@ export default function LandingPage() {
           <div className={styles.pricingGrid}>
             {plans.map((plan, i) => (
               <RevealSection key={plan.name} style={{ transitionDelay: `${i * 0.12}s` }}>
-                <div className={`${styles.pricingCard} ${plan.pro ? styles.pricingCardPro : ''}`}>
-                  {plan.pro && <div className={styles.proBadge}>Most Popular</div>}
-                  {plan.pro && <div className={styles.proGlow}></div>}
+                <div className={`${styles.pricingCard} ${plan.tier === 'pro' ? styles.pricingCardPro : ''}`}>
+                  {plan.tier === 'pro' && <div className={styles.proBadge}>Most Popular</div>}
+                  {plan.tier === 'pro' && <div className={styles.proGlow}></div>}
                   <div className={styles.pricingName}>{plan.name}</div>
                   <div className={styles.pricingDesc}>{plan.desc}</div>
                   <div className={styles.pricingPrice}>
@@ -219,7 +236,7 @@ export default function LandingPage() {
                   </ul>
                   <Link
                     to="/register"
-                    className={`${styles.pricingCta} ${plan.pro ? styles.pricingCtaPro : styles.pricingCtaFree}`}
+                    className={`${styles.pricingCta} ${plan.tier ? styles.pricingCtaPro : styles.pricingCtaFree}`}
                   >
                     {plan.cta}
                     <ArrowRight size={16} />

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-import { ArrowLeft, Download, Send, CheckCircle, Edit3, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, Send, CheckCircle, Edit3, Trash2, ExternalLink, Copy } from 'lucide-react';
 import styles from './InvoiceView.module.css';
 
 const STATUS_COLORS = {
@@ -29,10 +29,14 @@ export default function InvoiceView() {
   }, [id]);
 
   const handleSend = async () => {
+    const message = invoice.client_email
+      ? `Send invoice to ${invoice.client_email}?`
+      : 'No client email set. Mark as sent without emailing?';
+    if (!confirm(message)) return;
     try {
       await api.post(`/invoices/${id}/send`);
       setInvoice({ ...invoice, status: 'sent' });
-      toast.success('Invoice marked as sent');
+      toast.success(invoice.client_email ? 'Invoice sent!' : 'Invoice marked as sent');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed');
     }
@@ -200,6 +204,58 @@ export default function InvoiceView() {
             <span>Generated with AddFi</span>
           </div>
         </div>
+
+        {/* Portal Link */}
+        {invoice.portal_token && (invoice.status === 'sent' || invoice.status === 'overdue') && (
+          <div className="card" style={{ marginBottom: 16, padding: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Client Portal Link</div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type="text"
+                readOnly
+                value={`${window.location.origin}/portal/${invoice.portal_token}`}
+                style={{ flex: 1, fontSize: 12, padding: 8, background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', borderRadius: 6 }}
+                onClick={(e) => e.target.select()}
+              />
+              <button
+                className="btn btn-outline"
+                style={{ padding: '8px 12px', minWidth: 0 }}
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/portal/${invoice.portal_token}`);
+                  toast.success('Link copied');
+                }}
+              >
+                <Copy size={14} />
+              </button>
+              <a
+                href={`/portal/${invoice.portal_token}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline"
+                style={{ padding: '8px 12px', minWidth: 0 }}
+              >
+                <ExternalLink size={14} />
+              </a>
+            </div>
+            {invoice.portal_payment_enabled && (
+              <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 6 }}>
+                Online payment enabled (3.5% processing fee)
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Payment Status */}
+        {invoice.stripe_payment_intent_id && (
+          <div className="card" style={{ marginBottom: 16, padding: 12, background: 'rgba(52, 199, 89, 0.05)' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#34C759' }}>Paid Online</div>
+            {invoice.processing_fee && (
+              <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 4 }}>
+                Processing fee: ${parseFloat(invoice.processing_fee).toFixed(2)}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className={styles.actions}>

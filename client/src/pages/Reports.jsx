@@ -1,10 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, Crown } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
+import Skeleton from '../components/ui/Skeleton';
 import toast from 'react-hot-toast';
 import styles from './Reports.module.css';
+
+const CashFlowReport = lazy(() => import('../components/reports/CashFlowReport'));
+const TaxSummary = lazy(() => import('../components/reports/TaxSummary'));
+const ExpenseTrends = lazy(() => import('../components/reports/ExpenseTrends'));
+const RevenueByClient = lazy(() => import('../components/reports/RevenueByClient'));
+const PeriodComparison = lazy(() => import('../components/reports/PeriodComparison'));
+
+const MAX_TABS = [
+  { key: 'cashflow', label: 'Cash Flow' },
+  { key: 'tax', label: 'Tax' },
+  { key: 'trends', label: 'Trends' },
+  { key: 'clients', label: 'By Client' },
+  { key: 'compare', label: 'Compare' },
+];
 
 const PRESETS = [
   { label: 'This Month', getRange: () => {
@@ -30,6 +46,9 @@ const PRESETS = [
 ];
 
 export default function Reports() {
+  const { user } = useAuth();
+  const isMax = user?.plan === 'max';
+  const [activeTab, setActiveTab] = useState('pnl');
   const [dateRange, setDateRange] = useState(PRESETS[0].getRange());
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,6 +92,36 @@ export default function Reports() {
       <div className="container">
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>Reports</h1>
 
+        {/* Report Tabs */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 16, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <button
+            className={styles.preset}
+            style={{ padding: '8px 14px', fontWeight: activeTab === 'pnl' ? 700 : 400, background: activeTab === 'pnl' ? 'var(--color-primary)' : undefined, color: activeTab === 'pnl' ? '#fff' : undefined }}
+            onClick={() => setActiveTab('pnl')}
+          >
+            P&L
+          </button>
+          {isMax && MAX_TABS.map((t) => (
+            <button
+              key={t.key}
+              className={styles.preset}
+              style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? 'var(--color-primary)' : undefined, color: activeTab === t.key ? '#fff' : undefined }}
+              onClick={() => setActiveTab(t.key)}
+            >
+              {t.label}
+            </button>
+          ))}
+          {!isMax && (
+            <button
+              className={styles.preset}
+              style={{ padding: '8px 14px', whiteSpace: 'nowrap', color: '#FF9500', fontSize: 12 }}
+              onClick={() => setShowUpgrade(true)}
+            >
+              <Crown size={12} /> More with Max
+            </button>
+          )}
+        </div>
+
         {/* Date Range Presets */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 16, maxWidth: '100%' }}>
           {PRESETS.map((p) => (
@@ -109,9 +158,25 @@ export default function Reports() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="spinner" />
-        ) : data ? (
+        {/* Max Report Tabs */}
+        {activeTab !== 'pnl' && isMax && (
+          <Suspense fallback={<Skeleton height={300} style={{ borderRadius: 12 }} />}>
+            {activeTab === 'cashflow' && <CashFlowReport dateRange={dateRange} />}
+            {activeTab === 'tax' && <TaxSummary dateRange={dateRange} />}
+            {activeTab === 'trends' && <ExpenseTrends dateRange={dateRange} />}
+            {activeTab === 'clients' && <RevenueByClient dateRange={dateRange} />}
+            {activeTab === 'compare' && <PeriodComparison dateRange={dateRange} />}
+          </Suspense>
+        )}
+
+        {/* P&L Report */}
+        {activeTab === 'pnl' && loading ? (
+          <div>
+            <Skeleton height={120} style={{ borderRadius: 12, marginBottom: 16 }} />
+            <Skeleton height={160} style={{ borderRadius: 12, marginBottom: 16 }} />
+            <Skeleton height={160} style={{ borderRadius: 12 }} />
+          </div>
+        ) : activeTab === 'pnl' && data ? (
           <>
             {/* P&L Summary */}
             <div className={styles.pnlCard}>

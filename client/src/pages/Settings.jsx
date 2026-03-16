@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useCategories } from '../hooks/useCategories';
+import { useUsage } from '../hooks/useUsage';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { LogOut, Plus, Trash2, Edit3, Sparkles, Sun, Moon, Monitor } from 'lucide-react';
+import { LogOut, Plus, Trash2, Edit3, Sparkles, Sun, Moon, Monitor, Download, Crown } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import CancelModal from '../components/ui/CancelModal';
+import UsageBar from '../components/ui/UsageBar';
 import styles from './Settings.module.css';
 
 export default function Settings() {
@@ -16,6 +18,8 @@ export default function Settings() {
 
   const [email, setEmail] = useState(user?.email || '');
   const [businessName, setBusinessName] = useState(user?.business_name || '');
+  const [businessAddress, setBusinessAddress] = useState(user?.business_address || '');
+  const [businessPhone, setBusinessPhone] = useState(user?.business_phone || '');
   const [saving, setSaving] = useState(false);
   const [subscription, setSubscription] = useState(null);
 
@@ -25,17 +29,19 @@ export default function Settings() {
   const [catForm, setCatForm] = useState({ name: '', type: 'expense', color: '#4A90E2' });
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
+  const { usage, fetch: fetchUsage } = useUsage();
 
   useEffect(() => {
     api.get('/billing/subscription')
       .then((res) => setSubscription(res.data))
       .catch(() => {});
-  }, []);
+    fetchUsage();
+  }, [fetchUsage]);
 
   const handleSaveProfile = async () => {
     setSaving(true);
     try {
-      const data = { business_name: businessName };
+      const data = { business_name: businessName, business_address: businessAddress, business_phone: businessPhone };
       if (email !== user?.email) data.email = email;
       await updateProfile(data);
       toast.success('Profile updated');
@@ -46,9 +52,9 @@ export default function Settings() {
     }
   };
 
-  const handleUpgrade = async (plan) => {
+  const handleUpgrade = async (tier, plan) => {
     try {
-      const res = await api.post('/billing/checkout', { plan });
+      const res = await api.post('/billing/checkout', { tier, plan });
       window.location.href = res.data.url;
     } catch {
       toast.error('Failed to start checkout');
@@ -120,7 +126,21 @@ export default function Settings() {
         {/* Subscription */}
         <div className="card" style={{ marginBottom: 16 }}>
           <h3 className={styles.sectionTitle}>Subscription</h3>
-          {user?.plan === 'pro' ? (
+          {user?.plan === 'max' ? (
+            <div>
+              <div className={styles.planBadge} style={{ background: 'linear-gradient(135deg, #FF9500, #FF6B6B)' }}>
+                <Crown size={16} /> AddFi Max
+              </div>
+              {subscription?.subscription && (
+                <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginTop: 8 }}>
+                  {subscription.subscription.cancel_at_period_end
+                    ? `Cancels on ${new Date(subscription.subscription.current_period_end).toLocaleDateString()}`
+                    : `Renews on ${new Date(subscription.subscription.current_period_end).toLocaleDateString()}`
+                  }
+                </p>
+              )}
+            </div>
+          ) : user?.plan === 'pro' ? (
             <div>
               <div className={styles.planBadge}>
                 <Sparkles size={16} /> AddFi Pro
@@ -133,27 +153,65 @@ export default function Settings() {
                   }
                 </p>
               )}
+              {usage && (
+                <div style={{ marginTop: 16 }}>
+                  <UsageBar label="Transactions" used={usage.transactions.used} limit={usage.transactions.limit} />
+                  <UsageBar label="Receipt Scans" used={usage.scans.used} limit={usage.scans.limit} />
+                </div>
+              )}
+              <div style={{ marginTop: 16, padding: 12, background: 'var(--color-bg-secondary)', borderRadius: 8 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Need more? Upgrade to Max</p>
+                <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 12 }}>Unlimited everything, client database, custom invoices, payment portal & more.</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn btn-primary" style={{ flex: 1, minWidth: 0, padding: '10px 0', fontSize: 13 }} onClick={() => handleUpgrade('max', 'monthly')}>
+                    $79/mo
+                  </button>
+                  <button className="btn btn-success" style={{ flex: 1, minWidth: 0, padding: '10px 0', fontSize: 13 }} onClick={() => handleUpgrade('max', 'yearly')}>
+                    $59/mo yearly
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div>
               <div className={styles.planBadgeFree}>
                 AddFi Free
               </div>
-              <p style={{ fontSize: 14, marginBottom: 16, marginTop: 12, color: 'var(--color-text-secondary)' }}>
-                Upgrade for unlimited features.
+              {usage && (
+                <div style={{ marginTop: 12, marginBottom: 16 }}>
+                  <UsageBar label="Transactions" used={usage.transactions.used} limit={usage.transactions.limit} />
+                  <UsageBar label="Receipt Scans" used={usage.scans.used} limit={usage.scans.limit} />
+                </div>
+              )}
+              <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>
+                Upgrade for more features.
               </p>
-              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-                <button className="btn btn-primary" style={{ flex: 1, minWidth: 0, padding: '14px 0' }} onClick={() => handleUpgrade('monthly')}>
-                  $7.99/mo
-                </button>
-                <button className="btn btn-success" style={{ flex: 1, minWidth: 0, padding: '14px 0', overflow: 'visible', flexDirection: 'column', gap: 2 }} onClick={() => handleUpgrade('yearly')}>
-                  <span>$5.99/mo</span>
-                  <span style={{ fontSize: 11, opacity: 0.85, fontWeight: 600 }}>billed yearly</span>
-                </button>
+              {/* Pro tier */}
+              <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 8, marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, fontSize: 15 }}><Sparkles size={14} /> AddFi Pro</div>
+                <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: '6px 0 12px' }}>200 txns/mo, 80 scans/mo, invoicing, reports export</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn btn-primary" style={{ flex: 1, minWidth: 0, padding: '10px 0', fontSize: 13 }} onClick={() => handleUpgrade('pro', 'monthly')}>
+                    $7.99/mo
+                  </button>
+                  <button className="btn btn-success" style={{ flex: 1, minWidth: 0, padding: '10px 0', fontSize: 13 }} onClick={() => handleUpgrade('pro', 'yearly')}>
+                    $5.99/mo yearly
+                  </button>
+                </div>
               </div>
-              <p style={{ textAlign: 'right', fontSize: 12, fontWeight: 700, color: 'var(--color-success)', marginTop: 6 }}>
-                Save 25% with yearly
-              </p>
+              {/* Max tier */}
+              <div style={{ padding: 12, border: '2px solid #FF9500', borderRadius: 8, background: 'rgba(255, 149, 0, 0.04)' }}>
+                <div style={{ fontWeight: 700, fontSize: 15 }}><Crown size={14} /> AddFi Max</div>
+                <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', margin: '6px 0 12px' }}>Unlimited everything, clients, custom invoices, payment portal, imports, advanced reports</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn btn-primary" style={{ flex: 1, minWidth: 0, padding: '10px 0', fontSize: 13 }} onClick={() => handleUpgrade('max', 'monthly')}>
+                    $79/mo
+                  </button>
+                  <button className="btn btn-success" style={{ flex: 1, minWidth: 0, padding: '10px 0', fontSize: 13 }} onClick={() => handleUpgrade('max', 'yearly')}>
+                    $59/mo yearly
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -208,6 +266,24 @@ export default function Settings() {
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               placeholder="Your business name"
+            />
+          </div>
+          <div className="form-group">
+            <label>Business Address</label>
+            <textarea
+              rows={2}
+              value={businessAddress}
+              onChange={(e) => setBusinessAddress(e.target.value)}
+              placeholder="123 Main St, City, State ZIP"
+            />
+          </div>
+          <div className="form-group">
+            <label>Business Phone</label>
+            <input
+              type="tel"
+              value={businessPhone}
+              onChange={(e) => setBusinessPhone(e.target.value)}
+              placeholder="(555) 123-4567"
             />
           </div>
           <button className="btn btn-primary" onClick={handleSaveProfile} disabled={saving}>
@@ -287,13 +363,70 @@ export default function Settings() {
           ))}
         </div>
 
+        {/* Stripe Connect (Max only) */}
+        {user?.plan === 'max' && (
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 className={styles.sectionTitle}>Payment Processing</h3>
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+              Accept payments on invoices through your client portal. 3.5% processing fee per payment.
+            </p>
+            {user?.stripe_connect_onboarded ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 12, background: 'rgba(52, 199, 89, 0.1)', borderRadius: 8 }}>
+                <span style={{ color: '#34C759', fontWeight: 600, fontSize: 14 }}>Connected</span>
+                <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>You can accept payments on invoices</span>
+              </div>
+            ) : (
+              <button
+                className="btn btn-primary"
+                onClick={async () => {
+                  try {
+                    const res = await api.post('/connect/onboard');
+                    window.location.href = res.data.url;
+                  } catch {
+                    toast.error('Failed to start onboarding');
+                  }
+                }}
+              >
+                Connect with Stripe
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Data Export */}
+        <div className="card" style={{ marginBottom: 16 }}>
+          <h3 className={styles.sectionTitle}>Your Data</h3>
+          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+            Download all your data as a JSON file.
+          </p>
+          <button
+            className="btn btn-outline"
+            onClick={async () => {
+              try {
+                const res = await api.get('/data/export', { responseType: 'blob' });
+                const url = URL.createObjectURL(new Blob([res.data]));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'addfi-data-export.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                toast.success('Data exported');
+              } catch {
+                toast.error('Export failed');
+              }
+            }}
+          >
+            <Download size={16} /> Export My Data
+          </button>
+        </div>
+
         {/* Logout */}
         <button className="btn btn-danger btn-full" onClick={logout}>
           <LogOut size={18} /> Sign Out
         </button>
 
         {/* Billing — buried at the bottom */}
-        {user?.plan === 'pro' && (!subscription?.subscription || !subscription.subscription.cancel_at_period_end) && (
+        {(user?.plan === 'pro' || user?.plan === 'max') && (!subscription?.subscription || !subscription.subscription.cancel_at_period_end) && (
           <div style={{ textAlign: 'center', marginTop: 24, paddingBottom: 12 }}>
             <button className={styles.cancelLink} onClick={() => setShowCancel(true)}>
               Cancel subscription

@@ -1,4 +1,4 @@
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id          UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     type             VARCHAR(10) NOT NULL CHECK (type IN ('income', 'expense')),
@@ -15,6 +15,6 @@ CREATE TABLE transactions (
     updated_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_transactions_user_date ON transactions(user_id, date DESC);
-CREATE INDEX idx_transactions_user_type ON transactions(user_id, type);
-CREATE INDEX idx_transactions_user_category ON transactions(user_id, category_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_date ON transactions(user_id, date DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_type ON transactions(user_id, type);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_category ON transactions(user_id, category_id);

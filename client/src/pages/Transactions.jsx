@@ -4,6 +4,7 @@ import { useTransactions } from '../hooks/useTransactions';
 import { useCategories } from '../hooks/useCategories';
 import { format } from 'date-fns';
 import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import Skeleton from '../components/ui/Skeleton';
 import styles from './Transactions.module.css';
 
 export default function Transactions() {
@@ -78,7 +79,11 @@ export default function Transactions() {
 
         {/* List */}
         {loading ? (
-          <div className="spinner" />
+          <div style={{ marginTop: 8 }}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} height={56} style={{ borderRadius: 10, marginBottom: 8 }} />
+            ))}
+          </div>
         ) : transactions.length === 0 ? (
           <div className="empty-state">
             <p>No transactions found</p>

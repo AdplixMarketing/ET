@@ -1,0 +1,179 @@
+import multer from 'multer';
+import pool from '../config/db.js';
+import { parseCSV, parseQBO, applyMapping } from '../services/import.service.js';
+
+const uploadMiddleware = multer({ storage: multer.memoryStorage() });
+
+export const uploadFile = uploadMiddleware.single('file');
+
+export async function upload(req, res, next) {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const filename = req.file.originalname;
+    const ext = filename.split('.').pop().toLowerCase();
+
+    let file_type;
+    if (ext === 'csv') file_type = 'csv';
+    else if (ext === 'qbo' || ext === 'ofx') file_type = 'qbo';
+    else return res.status(400).json({ error: 'Unsupported file type. Upload CSV or QBO/OFX files.' });
+
+    let headers = [];
+    let totalRows = 0;
+
+    if (file_type === 'csv') {
+      const parsed = parseCSV(req.file.buffer);
+      headers = parsed.headers;
+      totalRows = parsed.rows.length;
+    } else {
+      const transactions = parseQBO(req.file.buffer);
+      headers = ['type', 'amount', 'date', 'description', 'vendor_or_client', 'notes'];
+      totalRows = transactions.length;
+    }
+
+    const result = await pool.query(
+      `INSERT INTO import_jobs (user_id, filename, file_type, status, total_rows)
+       VALUES ($1, $2, $3, 'mapping', $4)
+       RETURNING *`,
+      [req.userId, filename, file_type, totalRows]
+    );
+
+    res.status(201).json({
+      job: result.rows[0],
+      headers,
+      totalRows,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function setMapping(req, res, next) {
+  try {
+    const { mapping } = req.body;
+    if (!mapping) return res.status(400).json({ error: 'mapping is required' });
+
+    const result = await pool.query(
+      `UPDATE import_jobs SET column_mapping = $3, status = 'preview', updated_at = NOW()
+       WHERE id = $1 AND user_id = $2
+       RETURNING *`,
+      [req.params.id, req.userId, JSON.stringify(mapping)]
+    );
+
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Import job not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function preview(req, res, next) {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM import_jobs WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.userId]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Import job not found' });
+
+    const job = result.rows[0];
+    if (!job.column_mapping) return res.status(400).json({ error: 'Column mapping not set. Set mapping first.' });
+
+    // We need the original file to preview - since we use memory storage,
+    // the file is not persisted. For preview, return the mapping info.
+    // In a production setup, the file would be stored in R2/S3.
+    res.json({
+      job,
+      message: 'Preview is based on the mapping configuration. Re-upload and execute to import.',
+      mapping: job.column_mapping,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function execute(req, res, next) {
+  try {
+    const jobResult = await pool.query(
+      'SELECT * FROM import_jobs WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.userId]
+    );
+    if (jobResult.rows.length === 0) return res.status(404).json({ error: 'Import job not found' });
+
+    const job = jobResult.rows[0];
+    if (!job.column_mapping) return res.status(400).json({ error: 'Column mapping not set' });
+
+    if (!req.file) return res.status(400).json({ error: 'File must be re-uploaded for execution' });
+
+    await pool.query(
+      `UPDATE import_jobs SET status = 'importing', updated_at = NOW() WHERE id = $1`,
+      [job.id]
+    );
+
+    let rows = [];
+    if (job.file_type === 'csv') {
+      const parsed = parseCSV(req.file.buffer);
+      rows = applyMapping(parsed.rows, job.column_mapping);
+    } else {
+      rows = parseQBO(req.file.buffer);
+    }
+
+    let importedCount = 0;
+    let skippedCount = 0;
+    const errors = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const txn = rows[i];
+      try {
+        await pool.query(
+          `INSERT INTO transactions (user_id, type, amount, date, description, vendor_or_client, notes)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            req.userId,
+            txn.type || 'expense',
+            txn.amount || 0,
+            txn.date || new Date().toISOString().split('T')[0],
+            txn.description || '',
+            txn.vendor_or_client || null,
+            txn.notes || null,
+          ]
+        );
+        importedCount++;
+      } catch (err) {
+        skippedCount++;
+        errors.push({ row: i + 1, error: err.message });
+      }
+    }
+
+    await pool.query(
+      `UPDATE import_jobs
+       SET status = 'completed', imported_count = $2, skipped_count = $3, errors = $4, updated_at = NOW()
+       WHERE id = $1`,
+      [job.id, importedCount, skippedCount, JSON.stringify(errors)]
+    );
+
+    res.json({
+      status: 'completed',
+      imported_count: importedCount,
+      skipped_count: skippedCount,
+      errors,
+    });
+  } catch (err) {
+    await pool.query(
+      `UPDATE import_jobs SET status = 'failed', updated_at = NOW() WHERE id = $1`,
+      [req.params.id]
+    ).catch(() => {});
+    next(err);
+  }
+}
+
+export async function history(req, res, next) {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM import_jobs WHERE user_id = $1 ORDER BY created_at DESC',
+      [req.userId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+}

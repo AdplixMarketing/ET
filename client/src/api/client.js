@@ -9,6 +9,10 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  const businessId = localStorage.getItem('businessId');
+  if (businessId) {
+    config.headers['x-business-id'] = businessId;
+  }
   return config;
 });
 

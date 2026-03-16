@@ -1,4 +1,4 @@
-CREATE TABLE invoices (
+CREATE TABLE IF NOT EXISTS invoices (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     invoice_number  VARCHAR(20) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE invoices (
     UNIQUE(user_id, invoice_number)
 );
 
-CREATE TABLE invoice_items (
+CREATE TABLE IF NOT EXISTS invoice_items (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     invoice_id  UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
     description VARCHAR(500) NOT NULL,
@@ -29,5 +29,5 @@ CREATE TABLE invoice_items (
     sort_order  INT DEFAULT 0
 );
 
-CREATE INDEX idx_invoices_user ON invoices(user_id);
-CREATE INDEX idx_invoices_status ON invoices(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_invoices_user ON invoices(user_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(user_id, status);

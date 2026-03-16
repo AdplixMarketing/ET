@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
@@ -8,21 +9,35 @@ import styles from './InvoiceForm.module.css';
 export default function InvoiceForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const isEdit = Boolean(id);
+  const [clientsList, setClientsList] = useState([]);
 
   const [form, setForm] = useState({
     client_name: '',
     client_email: '',
+    client_id: '',
     due_date: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
     notes: '',
     tax_rate: 0,
+    template_id: '',
+    portal_payment_enabled: false,
   });
+  const [templates, setTemplates] = useState([]);
 
   const [items, setItems] = useState([
     { description: '', quantity: 1, rate: 0 },
   ]);
 
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    // Fetch clients and templates for Max users
+    if (user?.plan === 'max') {
+      api.get('/clients').then((res) => setClientsList(res.data)).catch(() => {});
+      api.get('/templates').then((res) => setTemplates(res.data)).catch(() => {});
+    }
+  }, [user]);
 
   useEffect(() => {
     if (isEdit) {
@@ -105,6 +120,30 @@ export default function InvoiceForm() {
         <form onSubmit={handleSubmit}>
           <div className="card" style={{ marginBottom: 16 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Client Details</h3>
+            {clientsList.length > 0 && (
+              <div className="form-group">
+                <label>Select Client</label>
+                <select
+                  value={form.client_id}
+                  onChange={(e) => {
+                    const clientId = e.target.value;
+                    if (clientId) {
+                      const c = clientsList.find((cl) => cl.id === clientId);
+                      if (c) {
+                        setForm({ ...form, client_id: clientId, client_name: c.name, client_email: c.email || '' });
+                      }
+                    } else {
+                      setForm({ ...form, client_id: '' });
+                    }
+                  }}
+                >
+                  <option value="">Enter manually</option>
+                  {clientsList.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}{c.company ? ` (${c.company})` : ''}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="form-group">
               <label>Client Name *</label>
               <input
@@ -229,6 +268,35 @@ export default function InvoiceForm() {
               />
             </div>
           </div>
+
+          {/* Template & Payment (Max only) */}
+          {user?.plan === 'max' && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              {templates.length > 0 && (
+                <div className="form-group">
+                  <label>Invoice Template</label>
+                  <select value={form.template_id} onChange={(e) => setForm({ ...form, template_id: e.target.value })}>
+                    <option value="">Default template</option>
+                    {templates.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <input
+                  type="checkbox"
+                  id="portal_payment"
+                  checked={form.portal_payment_enabled}
+                  onChange={(e) => setForm({ ...form, portal_payment_enabled: e.target.checked })}
+                  style={{ width: 18, height: 18 }}
+                />
+                <label htmlFor="portal_payment" style={{ fontSize: 14, cursor: 'pointer' }}>
+                  Enable online payment (3.5% fee)
+                </label>
+              </div>
+            </div>
+          )}
 
           <button className="btn btn-primary btn-full" disabled={saving}>
             {saving ? 'Saving...' : isEdit ? 'Update Invoice' : 'Create Invoice'}

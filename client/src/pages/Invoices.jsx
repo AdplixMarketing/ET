@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import UpgradePrompt from '../components/ui/UpgradePrompt';
 import { Plus, FileText } from 'lucide-react';
 import { format } from 'date-fns';
+import Skeleton from '../components/ui/Skeleton';
 import styles from './Invoices.module.css';
 
 const STATUS_COLORS = {
@@ -23,7 +24,7 @@ export default function Invoices() {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    if (user?.plan !== 'pro') {
+    if (user?.plan !== 'pro' && user?.plan !== 'max') {
       setLoading(false);
       return;
     }
@@ -34,7 +35,7 @@ export default function Invoices() {
       .finally(() => setLoading(false));
   }, [user, filter]);
 
-  if (user?.plan !== 'pro') {
+  if (user?.plan !== 'pro' && user?.plan !== 'max') {
     return (
       <div className="page">
         <div className="container">
@@ -68,7 +69,11 @@ export default function Invoices() {
         </div>
 
         {loading ? (
-          <div className="spinner" />
+          <div style={{ marginTop: 8 }}>
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} height={72} style={{ borderRadius: 10, marginBottom: 8 }} />
+            ))}
+          </div>
         ) : invoices.length === 0 ? (
           <div className="empty-state">
             <FileText size={48} strokeWidth={1} />
