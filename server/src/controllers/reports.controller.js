@@ -145,12 +145,15 @@ export async function cashFlow(req, res, next) {
       [req.userId, parseInt(months)]
     );
 
-    const data = result.rows.map(r => ({
-      month: r.month,
-      inflow: parseFloat(r.inflow),
-      outflow: parseFloat(r.outflow),
-      net: parseFloat(r.inflow) - parseFloat(r.outflow),
-    }));
+    const data = result.rows.map(r => {
+      const d = new Date(r.month);
+      return {
+        month: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        inflow: parseFloat(r.inflow),
+        outflow: parseFloat(r.outflow),
+        net: parseFloat(r.inflow) - parseFloat(r.outflow),
+      };
+    });
 
     // Running balance
     let balance = 0;
