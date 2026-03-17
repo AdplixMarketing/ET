@@ -139,6 +139,13 @@
   font-weight: 600;
 }
 
+.centerLogo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
 @media (max-width: 480px) {
   .item { padding: 8px 6px; font-size: 10px; }
   .center { width: 48px; height: 48px; margin-top: -20px; }

@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   Home, ArrowLeftRight, BarChart3, Settings,
-  Plus, FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X,
+  FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X,
 } from 'lucide-react';
 import styles from './BottomNav.module.css';
 
@@ -78,7 +78,7 @@ export default function BottomNav() {
             className={`${styles.center} ${centerActive ? styles.centerIsActive : ''}`}
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            {menuOpen ? <X size={24} /> : <Plus size={24} />}
+            {menuOpen ? <X size={24} /> : <img src="/logo-192.png" alt="Menu" className={styles.centerLogo} />}
           </button>
         </div>
       ) : (
