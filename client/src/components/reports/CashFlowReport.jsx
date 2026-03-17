@@ -20,7 +20,7 @@ export default function CashFlowReport() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontSize: 18, fontWeight: 700 }}>Cash Flow</h2>
-        <div style={{ display: 'flex', gap: 4, background: 'var(--card-bg, #f3f4f6)', borderRadius: 8, padding: 2 }}>
+        <div style={{ display: 'flex', gap: 4, background: 'var(--color-surface)', borderRadius: 8, padding: 2 }}>
           {PERIODS.map(p => (
             <button
               key={p.value}
@@ -28,8 +28,8 @@ export default function CashFlowReport() {
               style={{
                 padding: '6px 14px', border: 'none', borderRadius: 6, cursor: 'pointer',
                 fontSize: 13, fontWeight: period === p.value ? 600 : 400,
-                background: period === p.value ? '#6366f1' : 'transparent',
-                color: period === p.value ? '#fff' : '#6b7280',
+                background: period === p.value ? 'var(--color-primary)' : 'transparent',
+                color: period === p.value ? '#fff' : 'var(--color-text-secondary)',
               }}
             >
               {p.label}
@@ -39,14 +39,14 @@ export default function CashFlowReport() {
       </div>
 
       {loading ? (
-        <div style={{ height: 300, background: 'var(--card-bg, #f3f4f6)', borderRadius: 10, animation: 'pulse 1.5s infinite' }} />
+        <div className="card" style={{ height: 300, opacity: 0.5 }} />
       ) : data && data.length > 0 ? (
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color, #e5e7eb)" />
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+            <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }} />
+            <YAxis tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }} />
+            <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8 }} />
             <Legend />
             <Line type="monotone" dataKey="inflow" stroke="#16a34a" strokeWidth={2} name="Inflow" dot={{ r: 4 }} />
             <Line type="monotone" dataKey="outflow" stroke="#ef4444" strokeWidth={2} name="Outflow" dot={{ r: 4 }} />
@@ -54,7 +54,7 @@ export default function CashFlowReport() {
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <div style={{ textAlign: 'center', padding: 48, color: '#6b7280' }}>
+        <div style={{ textAlign: 'center', padding: 48, color: 'var(--color-text-secondary)' }}>
           No data available for this period.
         </div>
       )}

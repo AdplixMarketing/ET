@@ -23,38 +23,38 @@ export default function RevenueByClient() {
 
       {loading ? (
         <>
-          <div style={{ height: 300, background: 'var(--card-bg, #f3f4f6)', borderRadius: 10, animation: 'pulse 1.5s infinite', marginBottom: 24 }} />
-          <div style={{ height: 200, background: 'var(--card-bg, #f3f4f6)', borderRadius: 10, animation: 'pulse 1.5s infinite' }} />
+          <div className="card" style={{ height: 300, opacity: 0.5, marginBottom: 24 }} />
+          <div className="card" style={{ height: 200, opacity: 0.5 }} />
         </>
       ) : chartData.length > 0 ? (
         <>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color, #e5e7eb)" />
-              <XAxis dataKey="client_name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip formatter={(value) => fmt(value)} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+              <XAxis dataKey="client_name" tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }} />
+              <YAxis tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }} />
+              <Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8 }} formatter={(value) => fmt(value)} />
               <Bar dataKey="total_revenue" fill="#6366f1" radius={[4, 4, 0, 0]} name="Revenue" />
             </BarChart>
           </ResponsiveContainer>
 
-          <div style={{ marginTop: 24, overflowX: 'auto' }}>
+          <div className="card" style={{ marginTop: 24, overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid var(--border-color, #e5e7eb)', fontWeight: 600 }}>Client</th>
-                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--border-color, #e5e7eb)', fontWeight: 600 }}>Total Revenue</th>
-                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--border-color, #e5e7eb)', fontWeight: 600 }}>Paid</th>
-                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--border-color, #e5e7eb)', fontWeight: 600 }}>Invoices</th>
+                  <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid var(--color-border)', fontWeight: 600 }}>Client</th>
+                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--color-border)', fontWeight: 600 }}>Total Revenue</th>
+                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--color-border)', fontWeight: 600 }}>Paid</th>
+                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--color-border)', fontWeight: 600 }}>Invoices</th>
                 </tr>
               </thead>
               <tbody>
                 {tableData.map((row, i) => (
                   <tr key={i}>
-                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color, #e5e7eb)', fontWeight: 500 }}>{row.client_name}</td>
-                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color, #e5e7eb)', textAlign: 'right' }}>{fmt(row.total_revenue)}</td>
-                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color, #e5e7eb)', textAlign: 'right', color: '#16a34a' }}>{fmt(row.paid_revenue)}</td>
-                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--border-color, #e5e7eb)', textAlign: 'right' }}>{row.invoice_count}</td>
+                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--color-border)', fontWeight: 500 }}>{row.client_name}</td>
+                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--color-border)', textAlign: 'right' }}>{fmt(row.total_revenue)}</td>
+                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--color-border)', textAlign: 'right', color: 'var(--color-success)' }}>{fmt(row.paid_revenue)}</td>
+                    <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--color-border)', textAlign: 'right' }}>{row.invoice_count}</td>
                   </tr>
                 ))}
               </tbody>
@@ -62,7 +62,7 @@ export default function RevenueByClient() {
           </div>
         </>
       ) : (
-        <div style={{ textAlign: 'center', padding: 48, color: '#6b7280' }}>
+        <div style={{ textAlign: 'center', padding: 48, color: 'var(--color-text-secondary)' }}>
           No revenue data available.
         </div>
       )}
