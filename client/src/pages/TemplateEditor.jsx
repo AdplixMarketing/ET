@@ -83,11 +83,10 @@ export default function TemplateEditor() {
   return (
     <div className="page">
       <div className="container">
-        {/* Top Bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <button
             onClick={() => navigate('/templates')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#374151' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--color-text)' }}
           >
             <ArrowLeft size={20} />
           </button>
@@ -97,112 +96,114 @@ export default function TemplateEditor() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Template Name */}
-          <div className="form-group">
-            <label>Template Name</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => updateField('name', e.target.value)}
-              placeholder="e.g. My Brand Template"
-              required
-            />
-          </div>
-
-          {/* Layout Selector */}
-          <div className="form-group">
-            <label>Layout</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-              {LAYOUTS.map((layout) => (
-                <button
-                  key={layout.value}
-                  type="button"
-                  onClick={() => updateField('layout', layout.value)}
-                  style={{
-                    padding: '14px 12px',
-                    border: form.layout === layout.value ? '2px solid #4A90E2' : '2px solid #E5E7EB',
-                    borderRadius: 10,
-                    background: form.layout === layout.value ? '#EFF6FF' : '#fff',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{layout.label}</div>
-                  <div style={{ fontSize: 11, color: '#6B7280' }}>{layout.desc}</div>
-                </button>
-              ))}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div className="form-group">
+              <label>Template Name</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={(e) => updateField('name', e.target.value)}
+                placeholder="e.g. My Brand Template"
+                required
+              />
             </div>
-          </div>
 
-          {/* Colors */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Palette size={14} /> Primary Color
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input
-                  type="color"
-                  value={form.primary_color}
-                  onChange={(e) => updateField('primary_color', e.target.value)}
-                  style={{ width: 40, height: 36, padding: 2, border: '1px solid #E5E7EB', borderRadius: 6, cursor: 'pointer' }}
-                />
-                <input
-                  type="text"
-                  value={form.primary_color}
-                  onChange={(e) => updateField('primary_color', e.target.value)}
-                  style={{ flex: 1, fontFamily: 'monospace', fontSize: 13 }}
-                />
-              </div>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Palette size={14} /> Secondary Color
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input
-                  type="color"
-                  value={form.secondary_color}
-                  onChange={(e) => updateField('secondary_color', e.target.value)}
-                  style={{ width: 40, height: 36, padding: 2, border: '1px solid #E5E7EB', borderRadius: 6, cursor: 'pointer' }}
-                />
-                <input
-                  type="text"
-                  value={form.secondary_color}
-                  onChange={(e) => updateField('secondary_color', e.target.value)}
-                  style={{ flex: 1, fontFamily: 'monospace', fontSize: 13 }}
-                />
+            <div className="form-group">
+              <label>Layout</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {LAYOUTS.map((layout) => (
+                  <button
+                    key={layout.value}
+                    type="button"
+                    onClick={() => updateField('layout', layout.value)}
+                    style={{
+                      padding: '14px 12px',
+                      border: form.layout === layout.value ? `2px solid var(--color-primary)` : '2px solid var(--color-border)',
+                      borderRadius: 10,
+                      background: form.layout === layout.value ? 'rgba(74, 144, 226, 0.1)' : 'var(--color-surface)',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      transition: 'all 0.15s ease',
+                      color: 'var(--color-text)',
+                    }}
+                  >
+                    <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{layout.label}</div>
+                    <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{layout.desc}</div>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Footer Text */}
-          <div className="form-group">
-            <label>Footer Text</label>
-            <textarea
-              value={form.footer_text}
-              onChange={(e) => updateField('footer_text', e.target.value)}
-              placeholder="Thank you for your business."
-              rows={2}
-              style={{ resize: 'vertical' }}
-            />
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Colors</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Palette size={14} /> Primary
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="color"
+                    value={form.primary_color}
+                    onChange={(e) => updateField('primary_color', e.target.value)}
+                    style={{ width: 40, height: 36, padding: 2, border: '1px solid var(--color-border)', borderRadius: 6, cursor: 'pointer' }}
+                  />
+                  <input
+                    type="text"
+                    value={form.primary_color}
+                    onChange={(e) => updateField('primary_color', e.target.value)}
+                    style={{ flex: 1, fontFamily: 'monospace', fontSize: 13 }}
+                  />
+                </div>
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Palette size={14} /> Secondary
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="color"
+                    value={form.secondary_color}
+                    onChange={(e) => updateField('secondary_color', e.target.value)}
+                    style={{ width: 40, height: 36, padding: 2, border: '1px solid var(--color-border)', borderRadius: 6, cursor: 'pointer' }}
+                  />
+                  <input
+                    type="text"
+                    value={form.secondary_color}
+                    onChange={(e) => updateField('secondary_color', e.target.value)}
+                    style={{ flex: 1, fontFamily: 'monospace', fontSize: 13 }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Hide Branding */}
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div className="form-group">
+              <label>Footer Text</label>
+              <textarea
+                value={form.footer_text}
+                onChange={(e) => updateField('footer_text', e.target.value)}
+                placeholder="Thank you for your business."
+                rows={2}
+                style={{ resize: 'vertical' }}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <input
                 type="checkbox"
+                id="hide_branding"
                 checked={form.hide_branding}
                 onChange={(e) => updateField('hide_branding', e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#4A90E2' }}
+                style={{ width: 18, height: 18 }}
               />
-              <span>Hide "Powered by AddFi" branding</span>
-            </label>
+              <label htmlFor="hide_branding" style={{ fontSize: 14, cursor: 'pointer' }}>
+                Hide "Powered by AddFi" branding
+              </label>
+            </div>
           </div>
 
-          {/* Save Button */}
           <button
             className="btn btn-primary btn-full"
             disabled={saving}
@@ -213,7 +214,7 @@ export default function TemplateEditor() {
           </button>
         </form>
 
-        {/* Preview Section */}
+        {/* Preview — always light background since invoices render on white */}
         <div style={{ marginBottom: 32 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Eye size={16} /> Preview
@@ -221,13 +222,12 @@ export default function TemplateEditor() {
           <div
             style={{
               background: '#fff',
+              color: '#111',
               borderRadius: 12,
               overflow: 'hidden',
-              boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-              border: '1px solid #E5E7EB',
+              boxShadow: '0 2px 16px rgba(0,0,0,0.1)',
             }}
           >
-            {/* Accent bar */}
             <div
               style={{
                 height: 4,
@@ -239,16 +239,9 @@ export default function TemplateEditor() {
             />
 
             <div style={{ padding: form.layout === 'minimal' ? '16px 20px' : '24px 20px' }}>
-              {/* Preview Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                 <div>
-                  <div
-                    style={{
-                      fontSize: form.layout === 'minimal' ? 16 : 18,
-                      fontWeight: 700,
-                      color: form.layout === 'modern' ? form.primary_color : '#111',
-                    }}
-                  >
+                  <div style={{ fontSize: form.layout === 'minimal' ? 16 : 18, fontWeight: 700, color: form.layout === 'modern' ? form.primary_color : '#111' }}>
                     Your Business Name
                   </div>
                   <div style={{ fontSize: 12, color: '#6B7280' }}>you@email.com</div>
@@ -259,11 +252,8 @@ export default function TemplateEditor() {
                 </div>
               </div>
 
-              {form.layout !== 'minimal' && (
-                <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: '12px 0' }} />
-              )}
+              {form.layout !== 'minimal' && <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: '12px 0' }} />}
 
-              {/* Preview Bill To */}
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
                 <div>
                   <div style={{ fontSize: 9, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>BILL TO</div>
@@ -275,14 +265,12 @@ export default function TemplateEditor() {
                 </div>
               </div>
 
-              {/* Preview Items */}
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 12 }}>
                 <thead>
                   <tr style={{ borderBottom: `2px solid ${form.primary_color}20` }}>
-                    <th style={{ textAlign: 'left', padding: '6px 2px', fontSize: 9, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>Description</th>
-                    <th style={{ textAlign: 'right', padding: '6px 2px', fontSize: 9, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>Qty</th>
-                    <th style={{ textAlign: 'right', padding: '6px 2px', fontSize: 9, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>Rate</th>
-                    <th style={{ textAlign: 'right', padding: '6px 2px', fontSize: 9, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>Amount</th>
+                    {['Description', 'Qty', 'Rate', 'Amount'].map((h, i) => (
+                      <th key={h} style={{ textAlign: i === 0 ? 'left' : 'right', padding: '6px 2px', fontSize: 9, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -297,7 +285,6 @@ export default function TemplateEditor() {
                 </tbody>
               </table>
 
-              {/* Preview Total */}
               <div style={{ textAlign: 'right', borderTop: '2px solid #F0F0F0', paddingTop: 8 }}>
                 <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 2 }}>Subtotal: $3,500.00</div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: form.layout === 'modern' ? form.primary_color : '#111' }}>
@@ -306,7 +293,6 @@ export default function TemplateEditor() {
               </div>
             </div>
 
-            {/* Preview Footer */}
             <div
               style={{
                 padding: '10px 20px',
