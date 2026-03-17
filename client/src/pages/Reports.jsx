@@ -97,8 +97,7 @@ export default function Reports() {
         {/* Report Tabs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 16 }}>
           <button
-            className={styles.preset}
-            style={{ padding: '8px 14px', fontWeight: activeTab === 'pnl' ? 700 : 400, background: activeTab === 'pnl' ? 'var(--color-primary)' : undefined, color: activeTab === 'pnl' ? '#fff' : undefined }}
+            className={`${styles.preset} ${activeTab === 'pnl' ? styles.presetActive : ''}`}
             onClick={() => setActiveTab('pnl')}
           >
             P&L
@@ -106,8 +105,7 @@ export default function Reports() {
           {isMax && MAX_TABS.map((t) => (
             <button
               key={t.key}
-              className={styles.preset}
-              style={{ padding: '8px 14px', fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? 'var(--color-primary)' : undefined, color: activeTab === t.key ? '#fff' : undefined }}
+              className={`${styles.preset} ${activeTab === t.key ? styles.presetActive : ''}`}
               onClick={() => setActiveTab(t.key)}
             >
               {t.label}

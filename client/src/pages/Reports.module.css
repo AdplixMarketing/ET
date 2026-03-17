@@ -21,11 +21,14 @@
 }
 
 .preset:hover {
-  background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
-  transform: translateY(-1px);
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+.presetActive {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-color: var(--color-primary) !important;
 }
 
 .dateRow {
