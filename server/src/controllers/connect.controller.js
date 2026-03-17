@@ -27,6 +27,7 @@ export async function createAccount(req, res, next) {
 
     res.json({ account_id: account.id });
   } catch (err) {
+    console.error('Connect createAccount error:', err.message);
     next(err);
   }
 }
@@ -53,6 +54,7 @@ export async function createOnboardingLink(req, res, next) {
 
     res.json({ url: link.url });
   } catch (err) {
+    console.error('Connect onboarding error:', err.message);
     next(err);
   }
 }
