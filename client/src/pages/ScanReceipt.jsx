@@ -17,6 +17,7 @@ export default function ScanReceipt() {
   const [result, setResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState('scan');
 
   const handleFile = (e) => {
     const f = e.target.files[0];
@@ -73,8 +74,14 @@ export default function ScanReceipt() {
       await api.post('/transactions', body);
       toast.success('Expense saved!');
       navigate('/transactions');
-    } catch {
-      toast.error('Failed to save');
+    } catch (err) {
+      console.error('Save error:', err.response?.data || err.message);
+      if (err.response?.status === 403 && err.response?.data?.upgrade) {
+        setUpgradeReason('transaction');
+        setShowUpgrade(true);
+      } else {
+        toast.error(err.response?.data?.error || 'Failed to save');
+      }
     } finally {
       setSaving(false);
     }
@@ -164,8 +171,10 @@ export default function ScanReceipt() {
         )}
         {showUpgrade && (
           <UpgradeModal
-            title="Scan Limit Reached"
-            message="You've used all 5 free receipt scans this month. Upgrade to Pro for unlimited scans."
+            title={upgradeReason === 'scan' ? 'Scan Limit Reached' : 'Transaction Limit Reached'}
+            message={upgradeReason === 'scan'
+              ? "You've used all 5 free receipt scans this month. Upgrade to Pro for unlimited scans."
+              : "You've hit your monthly transaction limit. Upgrade your plan for more."}
             onClose={() => setShowUpgrade(false)}
           />
         )}

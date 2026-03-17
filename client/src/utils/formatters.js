@@ -21,7 +21,8 @@ export function formatMoney(value) {
 // Parse formatted money string back to a plain number
 // Input: "1,234.56" → 1234.56
 export function parseMoney(formatted) {
-  const num = parseFloat(formatted.replace(/,/g, ''));
+  if (typeof formatted === 'number') return isNaN(formatted) ? 0 : formatted;
+  const num = parseFloat(String(formatted).replace(/,/g, ''));
   return isNaN(num) ? 0 : num;
 }
 
