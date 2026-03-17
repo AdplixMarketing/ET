@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { useReports } from '../../hooks/useReports';
 
@@ -78,29 +78,20 @@ export default function CashFlowReport() {
 
           {/* Chart */}
           <div className="card">
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-                <defs>
-                  <linearGradient id="inflowGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#16a34a" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="outflowGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} />
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -10 }} barGap={4}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'var(--color-text-secondary)' }} />
                 <YAxis tickFormatter={(v) => fmt(v)} tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} />
                 <Tooltip
                   contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, fontSize: 13 }}
                   formatter={(value) => fmtFull(value)}
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Area type="monotone" dataKey="inflow" stroke="#16a34a" strokeWidth={2} fill="url(#inflowGrad)" name="Inflow" />
-                <Area type="monotone" dataKey="outflow" stroke="#ef4444" strokeWidth={2} fill="url(#outflowGrad)" name="Outflow" />
-              </AreaChart>
+                <Bar dataKey="inflow" fill="#16a34a" radius={[6, 6, 0, 0]} name="Inflow" maxBarSize={60} />
+                <Bar dataKey="outflow" fill="#ef4444" radius={[6, 6, 0, 0]} name="Outflow" maxBarSize={60} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
 
@@ -110,10 +101,10 @@ export default function CashFlowReport() {
             {data.map((row, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < data.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
                 <span style={{ fontWeight: 500, fontSize: 14 }}>{row.month}</span>
-                <div style={{ display: 'flex', gap: 20, fontSize: 13 }}>
+                <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
                   <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>+{fmtFull(row.inflow)}</span>
                   <span style={{ color: 'var(--color-danger)', fontWeight: 600 }}>-{fmtFull(row.outflow)}</span>
-                  <span style={{ fontWeight: 700, color: row.net >= 0 ? 'var(--color-success)' : 'var(--color-danger)', minWidth: 80, textAlign: 'right' }}>
+                  <span style={{ fontWeight: 700, color: row.net >= 0 ? 'var(--color-success)' : 'var(--color-danger)', minWidth: 70, textAlign: 'right' }}>
                     {fmtFull(row.net)}
                   </span>
                 </div>
