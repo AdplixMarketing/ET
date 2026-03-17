@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCategories } from '../hooks/useCategories';
 import { useUsage } from '../hooks/useUsage';
@@ -13,6 +14,7 @@ import { formatPhone } from '../utils/formatters';
 import styles from './Settings.module.css';
 
 export default function Settings() {
+  const navigate = useNavigate();
   const { user, logout, updateProfile } = useAuth();
   const { categories, createCategory, updateCategory, deleteCategory } = useCategories();
   const { theme, setTheme } = useTheme();
@@ -364,6 +366,19 @@ export default function Settings() {
           ))}
         </div>
 
+        {/* Multi-Business (Max only) */}
+        {user?.plan === 'max' && (
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 className={styles.sectionTitle}>Businesses</h3>
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+              Manage multiple businesses from one account. Each business has its own transactions, invoices, and clients.
+            </p>
+            <button className="btn btn-outline" onClick={() => navigate('/businesses')}>
+              Manage Businesses
+            </button>
+          </div>
+        )}
+
         {/* Stripe Connect (Max only) */}
         {user?.plan === 'max' && (
           <div className="card" style={{ marginBottom: 16 }}>
@@ -381,7 +396,10 @@ export default function Settings() {
                 className="btn btn-primary"
                 onClick={async () => {
                   try {
-                    const res = await api.post('/connect/onboard');
+                    // Step 1: Create connect account if needed
+                    await api.post('/connect/account');
+                    // Step 2: Get onboarding link
+                    const res = await api.post('/connect/onboarding-link');
                     window.location.href = res.data.url;
                   } catch {
                     toast.error('Failed to start onboarding');

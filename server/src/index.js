@@ -30,6 +30,7 @@ import errorHandler from './middleware/errorHandler.js';
 import authenticate from './middleware/auth.js';
 import { startInvoiceOverdueJob } from './jobs/invoiceOverdue.js';
 import { startRecurringProcessor } from './jobs/recurringProcessor.js';
+import { startInvoiceReminderJob } from './jobs/invoiceReminders.js';
 
 dotenv.config();
 
@@ -137,4 +138,5 @@ app.listen(PORT, () => {
   console.log(`AddFi server running on port ${PORT}`);
   startInvoiceOverdueJob();
   startRecurringProcessor();
+  startInvoiceReminderJob();
 });

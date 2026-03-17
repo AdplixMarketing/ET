@@ -273,6 +273,93 @@ export async function revenueByClient(req, res, next) {
   }
 }
 
+export async function forecast(req, res, next) {
+  try {
+    const { months = 3 } = req.query;
+    const forecastMonths = Math.min(parseInt(months), 12);
+
+    // Get last 6 months of data for trend calculation
+    const result = await pool.query(
+      `SELECT date_trunc('month', date) as month,
+              SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as inflow,
+              SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as outflow
+       FROM transactions WHERE user_id = $1
+       AND date >= NOW() - INTERVAL '6 months'
+       GROUP BY date_trunc('month', date)
+       ORDER BY month`,
+      [req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({ historical: [], forecast: [], summary: null });
+    }
+
+    const historical = result.rows.map(r => {
+      const d = new Date(r.month);
+      return {
+        month: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        inflow: parseFloat(r.inflow),
+        outflow: parseFloat(r.outflow),
+        net: parseFloat(r.inflow) - parseFloat(r.outflow),
+        type: 'actual',
+      };
+    });
+
+    // Calculate averages and trends
+    const avgInflow = historical.reduce((s, h) => s + h.inflow, 0) / historical.length;
+    const avgOutflow = historical.reduce((s, h) => s + h.outflow, 0) / historical.length;
+
+    // Simple linear trend (growth rate per month)
+    let inflowTrend = 0;
+    let outflowTrend = 0;
+    if (historical.length >= 2) {
+      inflowTrend = (historical[historical.length - 1].inflow - historical[0].inflow) / (historical.length - 1);
+      outflowTrend = (historical[historical.length - 1].outflow - historical[0].outflow) / (historical.length - 1);
+    }
+
+    // Generate forecast
+    const forecastData = [];
+    const lastDate = new Date(result.rows[result.rows.length - 1].month);
+    for (let i = 1; i <= forecastMonths; i++) {
+      const d = new Date(lastDate);
+      d.setMonth(d.getMonth() + i);
+      const projectedInflow = Math.max(0, avgInflow + inflowTrend * i);
+      const projectedOutflow = Math.max(0, avgOutflow + outflowTrend * i);
+      forecastData.push({
+        month: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        inflow: Math.round(projectedInflow * 100) / 100,
+        outflow: Math.round(projectedOutflow * 100) / 100,
+        net: Math.round((projectedInflow - projectedOutflow) * 100) / 100,
+        type: 'forecast',
+      });
+    }
+
+    // Running balance
+    let balance = 0;
+    for (const row of [...historical, ...forecastData]) {
+      balance += row.net;
+      row.balance = Math.round(balance * 100) / 100;
+    }
+
+    const totalForecastInflow = forecastData.reduce((s, f) => s + f.inflow, 0);
+    const totalForecastOutflow = forecastData.reduce((s, f) => s + f.outflow, 0);
+
+    res.json({
+      historical,
+      forecast: forecastData,
+      summary: {
+        avg_monthly_income: Math.round(avgInflow * 100) / 100,
+        avg_monthly_expenses: Math.round(avgOutflow * 100) / 100,
+        projected_income: Math.round(totalForecastInflow * 100) / 100,
+        projected_expenses: Math.round(totalForecastOutflow * 100) / 100,
+        projected_net: Math.round((totalForecastInflow - totalForecastOutflow) * 100) / 100,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function periodComparison(req, res, next) {
   try {
     const { from1, to1, from2, to2 } = req.query;

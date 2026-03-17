@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   Home, ArrowLeftRight, BarChart3, Settings,
-  Plus, FileText, Users, LayoutTemplate, Repeat, Upload, Zap, X,
+  Plus, FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X,
 } from 'lucide-react';
 import styles from './BottomNav.module.css';
 
@@ -41,6 +41,7 @@ export default function BottomNav() {
         { to: '/recurring', icon: Repeat, label: 'Recurring' },
         { to: '/import', icon: Upload, label: 'Import' },
         { to: '/automation', icon: Zap, label: 'Automation' },
+        { to: '/businesses', icon: Building2, label: 'Businesses' },
       ]
     : [
         { to: '/invoices', icon: FileText, label: 'Invoices' },

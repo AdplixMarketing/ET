@@ -29,6 +29,7 @@ const ImportHistory = lazy(() => import('./pages/ImportHistory'));
 const Templates = lazy(() => import('./pages/Templates'));
 const TemplateEditor = lazy(() => import('./pages/TemplateEditor'));
 const InvoicePortal = lazy(() => import('./pages/InvoicePortal'));
+const Businesses = lazy(() => import('./pages/Businesses'));
 const BusinessForm = lazy(() => import('./pages/BusinessForm'));
 const Automation = lazy(() => import('./pages/Automation'));
 const AutomationRuleForm = lazy(() => import('./pages/AutomationRuleForm'));
@@ -92,6 +93,7 @@ export default function App() {
           <Route path="/templates" element={<Templates />} />
           <Route path="/templates/new" element={<TemplateEditor />} />
           <Route path="/templates/:id" element={<TemplateEditor />} />
+          <Route path="/businesses" element={<Businesses />} />
           <Route path="/businesses/new" element={<BusinessForm />} />
           <Route path="/businesses/:id/edit" element={<BusinessForm />} />
           <Route path="/automation" element={<Automation />} />

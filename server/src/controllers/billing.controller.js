@@ -227,6 +227,31 @@ export async function webhook(req, res) {
       break;
     }
 
+    case 'payment_intent.succeeded': {
+      const paymentIntent = event.data.object;
+      const invoiceId = paymentIntent.metadata?.invoice_id;
+
+      if (invoiceId) {
+        // Portal payment — mark invoice as paid
+        await pool.query(
+          `UPDATE invoices SET status = 'paid', stripe_payment_intent_id = $1, updated_at = NOW()
+           WHERE id = $2 AND status IN ('sent', 'overdue')`,
+          [paymentIntent.id, invoiceId]
+        );
+
+        // Find owner for audit log
+        const inv = await pool.query('SELECT user_id FROM invoices WHERE id = $1', [invoiceId]);
+        if (inv.rows[0]) {
+          await auditLog(inv.rows[0].user_id, 'invoice_paid', {
+            entityType: 'invoice',
+            entityId: invoiceId,
+            metadata: { amount: paymentIntent.amount, payment_intent: paymentIntent.id },
+          });
+        }
+      }
+      break;
+    }
+
     case 'invoice.payment_failed': {
       const invoice = event.data.object;
       console.warn('Payment failed for customer:', invoice.customer);

@@ -13,6 +13,7 @@ const TaxSummary = lazy(() => import('../components/reports/TaxSummary'));
 const ExpenseTrends = lazy(() => import('../components/reports/ExpenseTrends'));
 const RevenueByClient = lazy(() => import('../components/reports/RevenueByClient'));
 const PeriodComparison = lazy(() => import('../components/reports/PeriodComparison'));
+const ForecastReport = lazy(() => import('../components/reports/ForecastReport'));
 
 const MAX_TABS = [
   { key: 'cashflow', label: 'Cash Flow' },
@@ -20,6 +21,7 @@ const MAX_TABS = [
   { key: 'trends', label: 'Trends' },
   { key: 'clients', label: 'By Client' },
   { key: 'compare', label: 'Compare' },
+  { key: 'forecast', label: 'Forecast' },
 ];
 
 const PRESETS = [
@@ -166,6 +168,7 @@ export default function Reports() {
             {activeTab === 'trends' && <ExpenseTrends dateRange={dateRange} />}
             {activeTab === 'clients' && <RevenueByClient dateRange={dateRange} />}
             {activeTab === 'compare' && <PeriodComparison dateRange={dateRange} />}
+            {activeTab === 'forecast' && <ForecastReport dateRange={dateRange} />}
           </Suspense>
         )}
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { pnl, exportCSV, exportPDF, cashFlow, taxSummary, expenseTrends, revenueByClient, periodComparison } from '../controllers/reports.controller.js';
+import { pnl, exportCSV, exportPDF, cashFlow, taxSummary, expenseTrends, revenueByClient, periodComparison, forecast } from '../controllers/reports.controller.js';
 import authenticate from '../middleware/auth.js';
 import { requirePro, requireMax } from '../middleware/planGate.js';
 
@@ -16,5 +16,6 @@ router.get('/tax-summary', requireMax, taxSummary);
 router.get('/expense-trends', requireMax, expenseTrends);
 router.get('/revenue-by-client', requireMax, revenueByClient);
 router.get('/period-comparison', requireMax, periodComparison);
+router.get('/forecast', requireMax, forecast);
 
 export default router;
