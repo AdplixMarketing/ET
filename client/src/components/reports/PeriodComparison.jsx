@@ -11,7 +11,7 @@ export default function PeriodComparison() {
   const sixtyDaysAgo = new Date(today);
   sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
-  const formatDate = (d) => d.toISOString().split('T')[0];
+  const formatDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   const [period1Start, setPeriod1Start] = useState(formatDate(sixtyDaysAgo));
   const [period1End, setPeriod1End] = useState(formatDate(thirtyDaysAgo));

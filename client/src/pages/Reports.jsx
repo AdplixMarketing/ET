@@ -6,6 +6,7 @@ import { Download, FileText, Crown } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import Skeleton from '../components/ui/Skeleton';
 import toast from 'react-hot-toast';
+import { localDate } from '../utils/formatters';
 import styles from './Reports.module.css';
 
 const CashFlowReport = lazy(() => import('../components/reports/CashFlowReport'));
@@ -28,21 +29,21 @@ const PRESETS = [
   { label: 'This Month', getRange: () => {
     const now = new Date();
     return {
-      from: new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10),
-      to: now.toISOString().slice(0, 10),
+      from: localDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+      to: localDate(now),
     };
   }},
   { label: 'Last Month', getRange: () => {
     const now = new Date();
     const first = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const last = new Date(now.getFullYear(), now.getMonth(), 0);
-    return { from: first.toISOString().slice(0, 10), to: last.toISOString().slice(0, 10) };
+    return { from: localDate(first), to: localDate(last) };
   }},
   { label: 'This Year', getRange: () => {
     const now = new Date();
     return {
-      from: new Date(now.getFullYear(), 0, 1).toISOString().slice(0, 10),
-      to: now.toISOString().slice(0, 10),
+      from: localDate(new Date(now.getFullYear(), 0, 1)),
+      to: localDate(now),
     };
   }},
 ];

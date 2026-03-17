@@ -4,6 +4,7 @@ import api from '../api/client';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { ArrowLeft, Edit3, Mail, Phone, MapPin, Building } from 'lucide-react';
+import { parseLocalDate } from '../utils/formatters';
 
 const STATUS_COLORS = { draft: '#8E8E93', sent: '#4A90E2', paid: '#34C759', overdue: '#FF3B30' };
 
@@ -89,7 +90,7 @@ export default function ClientView() {
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14 }}>{inv.invoice_number}</div>
                   <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                    Due {format(new Date(inv.due_date), 'MMM d, yyyy')}
+                    Due {format(parseLocalDate(inv.due_date), 'MMM d, yyyy')}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

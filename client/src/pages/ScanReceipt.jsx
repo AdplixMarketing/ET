@@ -5,7 +5,7 @@ import { useCategories } from '../hooks/useCategories';
 import toast from 'react-hot-toast';
 import { Camera, Loader, Check } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
-import { formatMoney, parseMoney } from '../utils/formatters';
+import { formatMoney, parseMoney, localDate } from '../utils/formatters';
 import styles from './ScanReceipt.module.css';
 
 export default function ScanReceipt() {
@@ -37,7 +37,7 @@ export default function ScanReceipt() {
       });
       setResult({
         vendor: res.data.vendor || '',
-        date: res.data.date || new Date().toISOString().slice(0, 10),
+        date: res.data.date || localDate(),
         amount: res.data.amount || '',
         category_id: res.data.suggested_category?.id || '',
         receipt_path: res.data.receipt_path,

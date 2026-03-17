@@ -5,6 +5,7 @@ import { useCategories } from '../hooks/useCategories';
 import { format } from 'date-fns';
 import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import Skeleton from '../components/ui/Skeleton';
+import { parseLocalDate } from '../utils/formatters';
 import styles from './Transactions.module.css';
 
 export default function Transactions() {
@@ -102,7 +103,7 @@ export default function Transactions() {
                     {tx.vendor_or_client || tx.description || tx.category_name || 'Transaction'}
                   </span>
                   <span className={styles.meta}>
-                    {tx.category_name} &middot; {format(new Date(tx.date), 'MMM d, yyyy')}
+                    {tx.category_name} &middot; {format(parseLocalDate(tx.date), 'MMM d, yyyy')}
                     {tx.payment_method ? ` \u00B7 ${tx.payment_method}` : ''}
                   </span>
                 </div>

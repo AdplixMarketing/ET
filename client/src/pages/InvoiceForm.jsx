@@ -5,7 +5,7 @@ import api from '../api/client';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import styles from './InvoiceForm.module.css';
-import { formatMoney, parseMoney } from '../utils/formatters';
+import { formatMoney, parseMoney, localDate } from '../utils/formatters';
 
 export default function InvoiceForm() {
   const { id } = useParams();
@@ -18,7 +18,7 @@ export default function InvoiceForm() {
     client_name: '',
     client_email: '',
     client_id: '',
-    due_date: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+    due_date: localDate(new Date(Date.now() + 30 * 86400000)),
     notes: '',
     tax_rate: 0,
     template_id: '',

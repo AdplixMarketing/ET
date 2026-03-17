@@ -8,7 +8,7 @@ import { ArrowLeft, Trash2, Upload, Image, ExternalLink, X, AlertTriangle } from
 import UpgradeModal from '../components/ui/UpgradeModal';
 import styles from './TransactionForm.module.css';
 import { format } from 'date-fns';
-import { formatMoney, parseMoney } from '../utils/formatters';
+import { formatMoney, parseMoney, localDate, parseLocalDate } from '../utils/formatters';
 
 const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check', 'Other'];
 
@@ -22,7 +22,7 @@ export default function TransactionForm() {
   const [form, setForm] = useState({
     amount: '',
     category_id: '',
-    date: new Date().toISOString().slice(0, 10),
+    date: localDate(),
     vendor_or_client: '',
     payment_method: '',
     description: '',
@@ -303,7 +303,7 @@ export default function TransactionForm() {
             </p>
             {duplicateWarning.matches.map((d) => (
               <div key={d.id} style={{ fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--color-border)' }}>
-                ${parseFloat(d.amount).toFixed(2)} &middot; {d.vendor_or_client || 'Unknown'} &middot; {format(new Date(d.date), 'MMM d, yyyy')}
+                ${parseFloat(d.amount).toFixed(2)} &middot; {d.vendor_or_client || 'Unknown'} &middot; {format(parseLocalDate(d.date), 'MMM d, yyyy')}
               </div>
             ))}
             <button className="btn btn-outline" style={{ marginTop: 8, fontSize: 12, padding: '6px 12px' }} onClick={() => { setDuplicateWarning(null); navigate(-1); }}>

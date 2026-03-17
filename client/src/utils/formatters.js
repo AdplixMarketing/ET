@@ -25,6 +25,19 @@ export function parseMoney(formatted) {
   return isNaN(num) ? 0 : num;
 }
 
+// Get today's date as YYYY-MM-DD in local timezone (not UTC)
+export function localDate(d) {
+  const date = d || new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+// Parse a YYYY-MM-DD string as local date (avoids UTC shift)
+export function parseLocalDate(dateStr) {
+  if (!dateStr) return new Date();
+  const [y, m, d] = dateStr.split('T')[0].split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 // Format phone number as (123) 456-7890
 export function formatPhone(value) {
   // Strip everything except digits

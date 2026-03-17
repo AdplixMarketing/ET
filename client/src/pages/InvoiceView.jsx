@@ -5,6 +5,7 @@ import api from '../api/client';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { ArrowLeft, Download, Send, CheckCircle, Edit3, Trash2, ExternalLink, Copy } from 'lucide-react';
+import { parseLocalDate } from '../utils/formatters';
 import styles from './InvoiceView.module.css';
 
 const STATUS_COLORS = {
@@ -127,13 +128,13 @@ export default function InvoiceView() {
                 <div className={styles.dateItem}>
                   <div className={styles.label}>ISSUE DATE</div>
                   <span className={styles.dateValue}>
-                    {format(new Date(invoice.issue_date), 'MMM d, yyyy')}
+                    {format(parseLocalDate(invoice.issue_date), 'MMM d, yyyy')}
                   </span>
                 </div>
                 <div className={styles.dateItem}>
                   <div className={styles.label}>DUE DATE</div>
                   <span className={styles.dateValue}>
-                    {format(new Date(invoice.due_date), 'MMM d, yyyy')}
+                    {format(parseLocalDate(invoice.due_date), 'MMM d, yyyy')}
                   </span>
                 </div>
                 <div

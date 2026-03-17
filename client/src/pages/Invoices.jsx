@@ -7,6 +7,7 @@ import UpgradePrompt from '../components/ui/UpgradePrompt';
 import { Plus, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import Skeleton from '../components/ui/Skeleton';
+import { parseLocalDate } from '../utils/formatters';
 import styles from './Invoices.module.css';
 
 const STATUS_COLORS = {
@@ -98,7 +99,7 @@ export default function Invoices() {
                   <span className={styles.number}>{inv.invoice_number}</span>
                   <span className={styles.client}>{inv.client_name}</span>
                   <span className={styles.date}>
-                    Due {format(new Date(inv.due_date), 'MMM d, yyyy')}
+                    Due {format(parseLocalDate(inv.due_date), 'MMM d, yyyy')}
                   </span>
                 </div>
                 <div className={styles.right}>
