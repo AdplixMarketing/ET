@@ -50,7 +50,8 @@ export async function chart(req, res, next) {
 
     const chartData = {};
     for (const row of result.rows) {
-      const key = new Date(row.month).toISOString().slice(0, 7);
+      const d = new Date(row.month);
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
       if (!chartData[key]) chartData[key] = { month: key, income: 0, expenses: 0 };
       if (row.type === 'income') chartData[key].income = parseFloat(row.total);
       else chartData[key].expenses = parseFloat(row.total);

@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } fro
 export default function MonthlyChart({ data }) {
   const formatted = data.map((d) => ({
     ...d,
-    month: new Date(d.month + '-01').toLocaleDateString('en-US', { month: 'short' }),
+    month: new Date(parseInt(d.month.split('-')[0]), parseInt(d.month.split('-')[1]) - 1).toLocaleDateString('en-US', { month: 'short' }),
   }));
 
   return (

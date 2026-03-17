@@ -1,12 +1,16 @@
 import pool from '../config/db.js';
 import { generatePDF } from '../services/report.service.js';
 
+function toLocalDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export async function pnl(req, res, next) {
   try {
     const { from, to, period = 'monthly' } = req.query;
     const now = new Date();
-    const defaultFrom = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    const defaultTo = now.toISOString().slice(0, 10);
+    const defaultFrom = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+    const defaultTo = toLocalDateStr(now);
 
     const dateFrom = from || defaultFrom;
     const dateTo = to || defaultTo;
@@ -89,8 +93,8 @@ export async function exportPDF(req, res, next) {
   try {
     const { from, to } = req.query;
     const now = new Date();
-    const dateFrom = from || new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    const dateTo = to || now.toISOString().slice(0, 10);
+    const dateFrom = from || toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+    const dateTo = to || toLocalDateStr(now);
 
     const userResult = await pool.query('SELECT business_name, currency, business_address, business_phone FROM users WHERE id = $1', [req.userId]);
     const user = userResult.rows[0];
@@ -147,8 +151,9 @@ export async function cashFlow(req, res, next) {
 
     const data = result.rows.map(r => {
       const d = new Date(r.month);
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       return {
-        month: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        month: `${monthNames[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
         inflow: parseFloat(r.inflow),
         outflow: parseFloat(r.outflow),
         net: parseFloat(r.inflow) - parseFloat(r.outflow),
@@ -230,12 +235,16 @@ export async function expenseTrends(req, res, next) {
       [req.userId, parseInt(months)]
     );
 
-    res.json(result.rows.map(r => ({
-      month: r.month,
-      category: r.category || 'Uncategorized',
-      color: r.color || '#868E96',
-      total: parseFloat(r.total),
-    })));
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    res.json(result.rows.map(r => {
+      const d = new Date(r.month);
+      return {
+        month: `${monthNames[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
+        category: r.category || 'Uncategorized',
+        color: r.color || '#868E96',
+        total: parseFloat(r.total),
+      };
+    }));
   } catch (err) {
     next(err);
   }
@@ -294,10 +303,11 @@ export async function forecast(req, res, next) {
       return res.json({ historical: [], forecast: [], summary: null });
     }
 
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const historical = result.rows.map(r => {
       const d = new Date(r.month);
       return {
-        month: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        month: `${monthNames[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
         inflow: parseFloat(r.inflow),
         outflow: parseFloat(r.outflow),
         net: parseFloat(r.inflow) - parseFloat(r.outflow),
@@ -322,11 +332,11 @@ export async function forecast(req, res, next) {
     const lastDate = new Date(result.rows[result.rows.length - 1].month);
     for (let i = 1; i <= forecastMonths; i++) {
       const d = new Date(lastDate);
-      d.setMonth(d.getMonth() + i);
+      d.setUTCMonth(d.getUTCMonth() + i);
       const projectedInflow = Math.max(0, avgInflow + inflowTrend * i);
       const projectedOutflow = Math.max(0, avgOutflow + outflowTrend * i);
       forecastData.push({
-        month: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        month: `${monthNames[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
         inflow: Math.round(projectedInflow * 100) / 100,
         outflow: Math.round(projectedOutflow * 100) / 100,
         net: Math.round((projectedInflow - projectedOutflow) * 100) / 100,
