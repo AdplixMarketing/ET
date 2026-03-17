@@ -189,7 +189,8 @@ export async function getMe(req, res, next) {
   try {
     const result = await pool.query(
       `SELECT id, email, business_name, currency, plan, email_verified,
-              business_logo, business_address, business_phone, created_at
+              business_logo, business_address, business_phone,
+              stripe_connect_onboarded, default_business_id, created_at
        FROM users WHERE id = $1`,
       [req.userId]
     );
@@ -225,7 +226,8 @@ export async function updateMe(req, res, next) {
         updated_at = NOW()
        WHERE id = $6
        RETURNING id, email, business_name, currency, plan, email_verified,
-                 business_logo, business_address, business_phone`,
+                 business_logo, business_address, business_phone,
+                 stripe_connect_onboarded, default_business_id`,
       [email?.toLowerCase().trim() || null, business_name, currency, business_address, business_phone, req.userId]
     );
     res.json(result.rows[0]);
