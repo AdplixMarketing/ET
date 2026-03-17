@@ -400,9 +400,14 @@ export default function Settings() {
                     await api.post('/connect/account');
                     // Step 2: Get onboarding link
                     const res = await api.post('/connect/onboarding-link');
-                    window.location.href = res.data.url;
-                  } catch {
-                    toast.error('Failed to start onboarding');
+                    if (res.data.url) {
+                      window.location.href = res.data.url;
+                    } else {
+                      toast.error('No onboarding URL returned');
+                    }
+                  } catch (err) {
+                    console.error('Connect error:', err.response?.data || err.message);
+                    toast.error(err.response?.data?.error || 'Failed to start onboarding');
                   }
                 }}
               >
