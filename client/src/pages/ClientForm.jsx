@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/client';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Trash2 } from 'lucide-react';
+import { formatPhone } from '../utils/formatters';
 
 export default function ClientForm() {
   const { id } = useParams();
@@ -82,7 +83,7 @@ export default function ClientForm() {
             </div>
             <div className="form-group">
               <label>Phone</label>
-              <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 123-4567" />
+              <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })} placeholder="(555) 123-4567" />
             </div>
             <div className="form-group">
               <label>Company</label>

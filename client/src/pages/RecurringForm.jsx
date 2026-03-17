@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
+import { formatMoney, parseMoney } from '../utils/formatters';
 
 const FREQUENCIES = [
   { value: 'daily', label: 'Daily' },
@@ -86,8 +87,8 @@ export default function RecurringForm() {
     setSaving(true);
 
     const templateData = entityType === 'transaction'
-      ? { amount: parseFloat(amount), type: txType, description, vendor_or_client: vendorOrClient }
-      : { client_name: clientName, client_email: clientEmail, items: items.map(i => ({ ...i, qty: Number(i.qty), rate: parseFloat(i.rate) })) };
+      ? { amount: parseMoney(amount), type: txType, description, vendor_or_client: vendorOrClient }
+      : { client_name: clientName, client_email: clientEmail, items: items.map(i => ({ ...i, qty: Number(i.qty), rate: parseMoney(i.rate) })) };
 
     const payload = {
       entity_type: entityType,
@@ -169,7 +170,7 @@ export default function RecurringForm() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <label style={labelStyle}>Amount</label>
-                <input type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required placeholder="0.00" style={inputStyle} />
+                <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(formatMoney(e.target.value))} required placeholder="0.00" style={inputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Type</label>
@@ -220,8 +221,8 @@ export default function RecurringForm() {
                       style={inputStyle}
                     />
                     <input
-                      type="number" step="0.01" placeholder="Rate" value={item.rate}
-                      onChange={e => updateItem(idx, 'rate', e.target.value)}
+                      type="text" inputMode="decimal" placeholder="Rate" value={item.rate}
+                      onChange={e => updateItem(idx, 'rate', formatMoney(e.target.value))}
                       style={inputStyle}
                     />
                     <button

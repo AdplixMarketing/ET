@@ -9,6 +9,7 @@ import { useTheme } from '../hooks/useTheme';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import CancelModal from '../components/ui/CancelModal';
 import UsageBar from '../components/ui/UsageBar';
+import { formatPhone } from '../utils/formatters';
 import styles from './Settings.module.css';
 
 export default function Settings() {
@@ -282,7 +283,7 @@ export default function Settings() {
             <input
               type="tel"
               value={businessPhone}
-              onChange={(e) => setBusinessPhone(e.target.value)}
+              onChange={(e) => setBusinessPhone(formatPhone(e.target.value))}
               placeholder="(555) 123-4567"
             />
           </div>

@@ -5,6 +5,7 @@ import api from '../api/client';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import styles from './InvoiceForm.module.css';
+import { formatMoney, parseMoney } from '../utils/formatters';
 
 export default function InvoiceForm() {
   const { id } = useParams();
@@ -26,7 +27,7 @@ export default function InvoiceForm() {
   const [templates, setTemplates] = useState([]);
 
   const [items, setItems] = useState([
-    { description: '', quantity: 1, rate: 0 },
+    { description: '', quantity: '1', rate: '' },
   ]);
 
   const [saving, setSaving] = useState(false);
@@ -53,19 +54,19 @@ export default function InvoiceForm() {
         if (inv.items?.length > 0) {
           setItems(inv.items.map((i) => ({
             description: i.description,
-            quantity: parseFloat(i.quantity),
-            rate: parseFloat(i.rate),
+            quantity: String(parseFloat(i.quantity)),
+            rate: formatMoney(String(parseFloat(i.rate))),
           })));
         }
       });
     }
   }, [id, isEdit]);
 
-  const subtotal = items.reduce((s, i) => s + (i.quantity * i.rate), 0);
+  const subtotal = items.reduce((s, i) => s + ((parseFloat(i.quantity) || 0) * parseMoney(i.rate || '0')), 0);
   const taxAmount = subtotal * (form.tax_rate / 100);
   const total = subtotal + taxAmount;
 
-  const addItem = () => setItems([...items, { description: '', quantity: 1, rate: 0 }]);
+  const addItem = () => setItems([...items, { description: '', quantity: '1', rate: '' }]);
 
   const removeItem = (idx) => {
     if (items.length <= 1) return;
@@ -91,7 +92,14 @@ export default function InvoiceForm() {
 
     setSaving(true);
     try {
-      const payload = { ...form, items };
+      const payload = {
+        ...form,
+        items: items.map((i) => ({
+          description: i.description,
+          quantity: parseFloat(i.quantity) || 0,
+          rate: parseMoney(i.rate || '0'),
+        })),
+      };
       if (isEdit) {
         await api.put(`/invoices/${id}`, payload);
         toast.success('Invoice updated');
@@ -192,27 +200,25 @@ export default function InvoiceForm() {
                   <div className="form-group" style={{ marginBottom: 8, flex: 1, minWidth: 0 }}>
                     <label style={{ fontSize: 11 }}>Qty</label>
                     <input
-                      type="number"
-                      min="0.01"
-                      step="0.01"
+                      type="text"
+                      inputMode="decimal"
                       value={item.quantity}
-                      onChange={(e) => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => updateItem(idx, 'quantity', e.target.value.replace(/[^0-9.]/g, ''))}
                       style={{ width: '100%', minWidth: 0 }}
                     />
                   </div>
                   <div className="form-group" style={{ marginBottom: 8, flex: 1.4, minWidth: 0 }}>
                     <label style={{ fontSize: 11 }}>Rate ($)</label>
                     <input
-                      type="number"
-                      min="0"
-                      step="0.01"
+                      type="text"
+                      inputMode="decimal"
                       value={item.rate}
-                      onChange={(e) => updateItem(idx, 'rate', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => updateItem(idx, 'rate', formatMoney(e.target.value))}
                       style={{ width: '100%', minWidth: 0 }}
                     />
                   </div>
                   <span className={styles.lineTotal}>
-                    ${(item.quantity * item.rate).toFixed(2)}
+                    ${((parseFloat(item.quantity) || 0) * parseMoney(item.rate || '0')).toFixed(2)}
                   </span>
                   {items.length > 1 && (
                     <button type="button" className={styles.removeBtn} onClick={() => removeItem(idx)}>

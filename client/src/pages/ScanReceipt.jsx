@@ -5,6 +5,7 @@ import { useCategories } from '../hooks/useCategories';
 import toast from 'react-hot-toast';
 import { Camera, Loader, Check } from 'lucide-react';
 import UpgradeModal from '../components/ui/UpgradeModal';
+import { formatMoney, parseMoney } from '../utils/formatters';
 import styles from './ScanReceipt.module.css';
 
 export default function ScanReceipt() {
@@ -62,7 +63,7 @@ export default function ScanReceipt() {
     try {
       const body = {
         type: 'expense',
-        amount: result.amount,
+        amount: parseMoney(result.amount),
         date: result.date,
       };
       if (result.vendor) body.vendor_or_client = result.vendor;
@@ -125,10 +126,10 @@ export default function ScanReceipt() {
             <div className="form-group">
               <label>Amount</label>
               <input
-                type="number"
-                step="0.01"
+                type="text"
+                inputMode="decimal"
                 value={result.amount}
-                onChange={(e) => setResult({ ...result, amount: e.target.value })}
+                onChange={(e) => setResult({ ...result, amount: formatMoney(e.target.value) })}
               />
             </div>
 

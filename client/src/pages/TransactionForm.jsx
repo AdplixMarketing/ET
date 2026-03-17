@@ -8,6 +8,7 @@ import { ArrowLeft, Trash2, Upload, Image, ExternalLink, X, AlertTriangle } from
 import UpgradeModal from '../components/ui/UpgradeModal';
 import styles from './TransactionForm.module.css';
 import { format } from 'date-fns';
+import { formatMoney, parseMoney } from '../utils/formatters';
 
 const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Check', 'Other'];
 
@@ -42,7 +43,7 @@ export default function TransactionForm() {
         const tx = res.data;
         setType(tx.type);
         setForm({
-          amount: tx.amount,
+          amount: formatMoney(String(tx.amount)),
           category_id: tx.category_id || '',
           date: tx.date?.slice(0, 10),
           vendor_or_client: tx.vendor_or_client || '',
@@ -69,7 +70,8 @@ export default function TransactionForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.amount || parseFloat(form.amount) <= 0) {
+    const amount = parseMoney(form.amount);
+    if (!amount || amount <= 0) {
       toast.error('Enter a valid amount');
       return;
     }
@@ -77,7 +79,7 @@ export default function TransactionForm() {
     try {
       const fd = new FormData();
       fd.append('type', type);
-      fd.append('amount', form.amount);
+      fd.append('amount', amount);
       fd.append('date', form.date);
       if (form.category_id) fd.append('category_id', form.category_id);
       if (form.vendor_or_client) fd.append('vendor_or_client', form.vendor_or_client);
@@ -150,11 +152,11 @@ export default function TransactionForm() {
           <div className={styles.amountGroup}>
             <span className={styles.dollar}>$</span>
             <input
-              type="number"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               placeholder="0.00"
               value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
+              onChange={(e) => setForm({ ...form, amount: formatMoney(e.target.value) })}
               className={styles.amountInput}
               autoFocus
             />
