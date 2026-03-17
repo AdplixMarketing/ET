@@ -82,17 +82,12 @@ export default function Templates() {
             {templates.map((template) => (
               <div
                 key={template.id}
+                className="card"
                 style={{
-                  background: '#fff',
-                  borderRadius: 12,
-                  padding: '16px 18px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                  border: '1px solid #F0F0F0',
                   cursor: 'pointer',
-                  transition: 'box-shadow 0.15s ease',
                 }}
                 onClick={() => navigate(`/templates/${template.id}`)}
               >
@@ -111,11 +106,11 @@ export default function Templates() {
                     <div style={{ fontWeight: 600, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {template.name}
                     </div>
-                    <div style={{ fontSize: 12, color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
                       <Layout size={11} />
                       {template.layout || 'standard'}
                       {template.hide_branding && (
-                        <span style={{ marginLeft: 6, fontSize: 10, background: '#F3F4F6', padding: '1px 6px', borderRadius: 4 }}>
+                        <span style={{ marginLeft: 6, fontSize: 10, background: 'var(--color-surface)', padding: '1px 6px', borderRadius: 4 }}>
                           No branding
                         </span>
                       )}

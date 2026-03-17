@@ -14,14 +14,6 @@ const FREQUENCIES = [
   { value: 'yearly', label: 'Yearly' },
 ];
 
-const inputStyle = {
-  width: '100%', padding: '10px 12px', borderRadius: 8,
-  border: '1px solid var(--border-color, #d1d5db)', fontSize: 14,
-  background: 'var(--input-bg, #fff)',
-};
-
-const labelStyle = { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#374151' };
-
 export default function RecurringForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -115,149 +107,116 @@ export default function RecurringForm() {
   };
 
   return (
-    <div style={{ padding: 32, maxWidth: 680, margin: '0 auto' }}>
-      <button
-        onClick={() => navigate('/recurring')}
-        style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', marginBottom: 16, fontSize: 14 }}
-      >
-        <ArrowLeft size={16} /> Back to Recurring Rules
-      </button>
-
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>
-        {isEdit ? 'Edit Recurring Rule' : 'New Recurring Rule'}
-      </h1>
-
-      {/* Entity Type Tabs */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-color, #d1d5db)' }}>
-        {['transaction', 'invoice'].map(type => (
-          <button
-            key={type}
-            onClick={() => setEntityType(type)}
-            style={{
-              flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
-              fontWeight: 600, fontSize: 14,
-              background: entityType === type ? '#6366f1' : 'var(--card-bg, #fff)',
-              color: entityType === type ? '#fff' : '#6b7280',
-            }}
-          >
-            {type === 'transaction' ? 'Transaction' : 'Invoice'}
+    <div className="page">
+      <div className="container">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <button onClick={() => navigate('/recurring')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--color-text)' }}>
+            <ArrowLeft size={20} />
           </button>
-        ))}
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        {/* Frequency & Dates */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
-          <div>
-            <label style={labelStyle}>Frequency</label>
-            <select value={frequency} onChange={e => setFrequency(e.target.value)} style={inputStyle}>
-              {FREQUENCIES.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={labelStyle}>Next Run Date</label>
-            <input type="date" value={nextRunDate} onChange={e => setNextRunDate(e.target.value)} required style={inputStyle} />
-          </div>
-          <div>
-            <label style={labelStyle}>End Date (optional)</label>
-            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
-          </div>
+          <h1 style={{ fontSize: 22, fontWeight: 700 }}>
+            {isEdit ? 'Edit Recurring Rule' : 'New Recurring Rule'}
+          </h1>
         </div>
 
-        {/* Transaction Fields */}
-        {entityType === 'transaction' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div>
-                <label style={labelStyle}>Amount</label>
-                <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(formatMoney(e.target.value))} required placeholder="0.00" style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Type</label>
-                <select value={txType} onChange={e => setTxType(e.target.value)} style={inputStyle}>
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>
-                </select>
-              </div>
+        {/* Entity Type Tabs */}
+        <div className="toggle-group" style={{ marginBottom: 20 }}>
+          <button className={entityType === 'transaction' ? 'active' : ''} onClick={() => setEntityType('transaction')}>
+            Transaction
+          </button>
+          <button className={entityType === 'invoice' ? 'active' : ''} onClick={() => setEntityType('invoice')}>
+            Invoice
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {/* Frequency & Dates */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Schedule</h3>
+            <div className="form-group">
+              <label>Frequency</label>
+              <select value={frequency} onChange={e => setFrequency(e.target.value)}>
+                {FREQUENCIES.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
             </div>
-            <div>
-              <label style={labelStyle}>Description</label>
-              <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Monthly rent" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Vendor / Client</label>
-              <input type="text" value={vendorOrClient} onChange={e => setVendorOrClient(e.target.value)} placeholder="e.g. Landlord" style={inputStyle} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group">
+                <label>Next Run Date</label>
+                <input type="date" value={nextRunDate} onChange={e => setNextRunDate(e.target.value)} required style={{ padding: '12px 0' }} />
+              </div>
+              <div className="form-group">
+                <label>End Date (optional)</label>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: '12px 0' }} />
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Invoice Fields */}
-        {entityType === 'invoice' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div>
-                <label style={labelStyle}>Client Name</label>
-                <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} required placeholder="Client name" style={inputStyle} />
+          {/* Transaction Fields */}
+          {entityType === 'transaction' && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Transaction Details</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
+                  <label>Amount</label>
+                  <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(formatMoney(e.target.value))} required placeholder="0.00" />
+                </div>
+                <div className="form-group">
+                  <label>Type</label>
+                  <select value={txType} onChange={e => setTxType(e.target.value)}>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label style={labelStyle}>Client Email</label>
-                <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="client@email.com" style={inputStyle} />
+              <div className="form-group">
+                <label>Description</label>
+                <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Monthly rent" />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Vendor / Client</label>
+                <input type="text" value={vendorOrClient} onChange={e => setVendorOrClient(e.target.value)} placeholder="e.g. Landlord" />
               </div>
             </div>
+          )}
 
-            <div>
-              <label style={labelStyle}>Line Items</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {/* Invoice Fields */}
+          {entityType === 'invoice' && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Invoice Details</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
+                  <label>Client Name</label>
+                  <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} required placeholder="Client name" />
+                </div>
+                <div className="form-group">
+                  <label>Client Email</label>
+                  <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="client@email.com" />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Line Items</label>
                 {items.map((item, idx) => (
-                  <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: 8, alignItems: 'center' }}>
-                    <input
-                      type="text" placeholder="Description" value={item.description}
-                      onChange={e => updateItem(idx, 'description', e.target.value)}
-                      style={inputStyle}
-                    />
-                    <input
-                      type="number" placeholder="Qty" value={item.qty} min={1}
-                      onChange={e => updateItem(idx, 'qty', e.target.value)}
-                      style={inputStyle}
-                    />
-                    <input
-                      type="text" inputMode="decimal" placeholder="Rate" value={item.rate}
-                      onChange={e => updateItem(idx, 'rate', formatMoney(e.target.value))}
-                      style={inputStyle}
-                    />
-                    <button
-                      type="button" onClick={() => removeItem(idx)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: 4 }}
-                    >
+                  <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                    <input type="text" placeholder="Description" value={item.description} onChange={e => updateItem(idx, 'description', e.target.value)} />
+                    <input type="number" placeholder="Qty" value={item.qty} min={1} onChange={e => updateItem(idx, 'qty', e.target.value)} />
+                    <input type="text" inputMode="decimal" placeholder="Rate" value={item.rate} onChange={e => updateItem(idx, 'rate', formatMoney(e.target.value))} />
+                    <button type="button" onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-danger)', padding: 4 }}>
                       <Trash2 size={16} />
                     </button>
                   </div>
                 ))}
+                <button type="button" className="btn btn-outline" onClick={addItem} style={{ marginTop: 4, fontSize: 13 }}>
+                  <Plus size={14} /> Add Item
+                </button>
               </div>
-              <button
-                type="button" onClick={addItem}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6, marginTop: 8,
-                  background: 'none', border: 'none', cursor: 'pointer', color: '#6366f1', fontSize: 13, fontWeight: 600,
-                }}
-              >
-                <Plus size={14} /> Add Item
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
-        <button
-          type="submit" disabled={saving}
-          style={{
-            width: '100%', padding: '12px 0', background: '#6366f1', color: '#fff',
-            border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 15, cursor: 'pointer',
-            opacity: saving ? 0.6 : 1,
-          }}
-        >
-          {saving ? 'Saving...' : isEdit ? 'Update Rule' : 'Create Recurring Rule'}
-        </button>
-      </form>
+          <button className="btn btn-primary btn-full" type="submit" disabled={saving}>
+            {saving ? 'Saving...' : isEdit ? 'Update Rule' : 'Create Recurring Rule'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
