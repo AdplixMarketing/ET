@@ -95,7 +95,7 @@ export default function Reports() {
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>Reports</h1>
 
         {/* Report Tabs */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 16, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 16 }}>
           <button
             className={styles.preset}
             style={{ padding: '8px 14px', fontWeight: activeTab === 'pnl' ? 700 : 400, background: activeTab === 'pnl' ? 'var(--color-primary)' : undefined, color: activeTab === 'pnl' ? '#fff' : undefined }}
@@ -107,7 +107,7 @@ export default function Reports() {
             <button
               key={t.key}
               className={styles.preset}
-              style={{ padding: '8px 14px', whiteSpace: 'nowrap', fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? 'var(--color-primary)' : undefined, color: activeTab === t.key ? '#fff' : undefined }}
+              style={{ padding: '8px 14px', fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? 'var(--color-primary)' : undefined, color: activeTab === t.key ? '#fff' : undefined }}
               onClick={() => setActiveTab(t.key)}
             >
               {t.label}
@@ -116,7 +116,7 @@ export default function Reports() {
           {!isMax && (
             <button
               className={styles.preset}
-              style={{ padding: '8px 14px', whiteSpace: 'nowrap', color: '#FF9500', fontSize: 12 }}
+              style={{ padding: '8px 14px', color: '#FF9500', fontSize: 12 }}
               onClick={() => { setUpgradeType('max'); setShowUpgrade(true); }}
             >
               <Crown size={12} /> More with Max
