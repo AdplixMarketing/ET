@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import api from '../api/client';
 import { useRecurring } from '../hooks/useRecurring';
 import UpgradePrompt from '../components/ui/UpgradePrompt';
+import { parseLocalDate } from '../utils/formatters';
 
 export default function Recurring() {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ export default function Recurring() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-text-secondary)', fontSize: 13 }}>
                     <Calendar size={14} />
-                    <span>Next run: {rule.next_run_date ? new Date(rule.next_run_date).toLocaleDateString() : 'N/A'}</span>
+                    <span>Next run: {rule.next_run_date ? parseLocalDate(rule.next_run_date).toLocaleDateString() : 'N/A'}</span>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

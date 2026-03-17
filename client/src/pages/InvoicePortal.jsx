@@ -6,6 +6,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { FileText, CheckCircle, CreditCard, Loader, Lock } from 'lucide-react';
+import { parseLocalDate } from '../utils/formatters';
 
 const baseURL = import.meta.env.VITE_API_URL || '';
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
@@ -219,13 +220,13 @@ function PortalContent() {
                 <div style={{ marginBottom: 8 }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>ISSUE DATE</div>
                   <div style={{ fontSize: 14, color: '#1F2937' }}>
-                    {format(new Date(invoice.issue_date), 'MMM d, yyyy')}
+                    {format(parseLocalDate(invoice.issue_date), 'MMM d, yyyy')}
                   </div>
                 </div>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#8E8E93', letterSpacing: 1 }}>DUE DATE</div>
                   <div style={{ fontSize: 14, color: '#1F2937' }}>
-                    {format(new Date(invoice.due_date), 'MMM d, yyyy')}
+                    {format(parseLocalDate(invoice.due_date), 'MMM d, yyyy')}
                   </div>
                 </div>
               </div>

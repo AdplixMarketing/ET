@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { parseLocalDate } from '../../utils/formatters';
 import styles from './RecentTransactions.module.css';
 
 export default function RecentTransactions({ transactions }) {
@@ -31,7 +32,7 @@ export default function RecentTransactions({ transactions }) {
               {tx.vendor_or_client || tx.description || tx.category_name || 'Transaction'}
             </span>
             <span className={styles.meta}>
-              {tx.category_name} &middot; {format(new Date(tx.date), 'MMM d')}
+              {tx.category_name} &middot; {format(parseLocalDate(tx.date), 'MMM d')}
             </span>
           </div>
           <span className={`${styles.amount} ${tx.type === 'income' ? styles.income : styles.expense}`}>
