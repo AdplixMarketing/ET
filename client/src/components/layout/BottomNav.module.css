@@ -89,7 +89,7 @@
   bottom: calc(100% + 16px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--card-bg, #fff);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 8px;
