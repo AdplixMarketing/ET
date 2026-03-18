@@ -75,7 +75,9 @@ export async function getSubscription(req, res, next) {
       expires_at: user.plan_expires_at,
       subscription: subscription ? {
         status: subscription.status,
-        current_period_end: new Date(subscription.current_period_end * 1000),
+        current_period_end: subscription.current_period_end
+          ? new Date(subscription.current_period_end * 1000)
+          : null,
         cancel_at_period_end: subscription.cancel_at_period_end,
       } : null,
     });

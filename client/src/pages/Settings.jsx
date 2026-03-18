@@ -134,7 +134,7 @@ export default function Settings() {
               <div className={styles.planBadge} style={{ background: 'linear-gradient(135deg, #FF9500, #FF6B6B)' }}>
                 <Crown size={16} /> AddFi Max
               </div>
-              {subscription?.subscription && (
+              {subscription?.subscription?.current_period_end && (
                 <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginTop: 8 }}>
                   {subscription.subscription.cancel_at_period_end
                     ? `Cancels on ${new Date(subscription.subscription.current_period_end).toLocaleDateString()}`
@@ -148,7 +148,7 @@ export default function Settings() {
               <div className={styles.planBadge}>
                 <Sparkles size={16} /> AddFi Pro
               </div>
-              {subscription?.subscription && (
+              {subscription?.subscription?.current_period_end && (
                 <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginTop: 8 }}>
                   {subscription.subscription.cancel_at_period_end
                     ? `Cancels on ${new Date(subscription.subscription.current_period_end).toLocaleDateString()}`
