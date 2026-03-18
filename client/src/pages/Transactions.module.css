@@ -207,3 +207,8 @@
 .fabScan:active {
   transform: scale(0.95);
 }
+
+@media (max-width: 480px) {
+  .fab { width: 52px; height: 52px; right: 16px; }
+  .fabScan { width: 42px; height: 42px; right: 20px; bottom: calc(var(--nav-height) + 88px); }
+}
