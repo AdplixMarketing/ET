@@ -5,7 +5,7 @@ import { useCategories } from '../hooks/useCategories';
 import { useUsage } from '../hooks/useUsage';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { LogOut, Plus, Trash2, Edit3, Sparkles, Sun, Moon, Monitor, Download, Crown } from 'lucide-react';
+import { LogOut, Plus, Trash2, Edit3, Sparkles, Sun, Moon, Monitor, Download, Crown, Mail } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import UpgradeModal from '../components/ui/UpgradeModal';
 import CancelModal from '../components/ui/CancelModal';
@@ -442,6 +442,21 @@ export default function Settings() {
           >
             <Download size={16} /> Export My Data
           </button>
+        </div>
+
+        {/* Support */}
+        <div className="card" style={{ marginBottom: 16 }}>
+          <h3 className={styles.sectionTitle}>Support</h3>
+          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+            Found a bug or need help? Reach out and we'll get back to you.
+          </p>
+          <a
+            href="mailto:support@addfi.co?subject=Bug Report / Feedback"
+            className="btn btn-outline"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+          >
+            <Mail size={16} /> support@addfi.co
+          </a>
         </div>
 
         {/* Logout */}
