@@ -125,41 +125,44 @@ export default function Reports() {
           )}
         </div>
 
-        {/* Date Range Presets */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 16, maxWidth: '100%' }}>
-          {PRESETS.map((p) => (
-            <button
-              key={p.label}
-              className={styles.preset}
-              style={{ flex: 1, minWidth: 0, padding: '10px 0' }}
-              onClick={() => setDateRange(p.getRange())}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        {/* Date Range Presets & Custom Range — only for P&L */}
+        {activeTab === 'pnl' && (
+          <>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 16, maxWidth: '100%' }}>
+              {PRESETS.map((p) => (
+                <button
+                  key={p.label}
+                  className={styles.preset}
+                  style={{ flex: 1, minWidth: 0, padding: '10px 0' }}
+                  onClick={() => setDateRange(p.getRange())}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
 
-        {/* Custom Date Range */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, maxWidth: '100%' }}>
-          <div className={`form-group ${styles.dateField}`} style={{ flex: 1, minWidth: 0, marginBottom: 0 }}>
-            <label>From</label>
-            <input
-              type="date"
-              value={dateRange.from}
-              onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
-              style={{ padding: '12px 0' }}
-            />
-          </div>
-          <div className={`form-group ${styles.dateField}`} style={{ flex: 1, minWidth: 0, marginBottom: 0 }}>
-            <label>To</label>
-            <input
-              type="date"
-              value={dateRange.to}
-              onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
-              style={{ padding: '12px 0' }}
-            />
-          </div>
-        </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 24, maxWidth: '100%' }}>
+              <div className={`form-group ${styles.dateField}`} style={{ flex: 1, minWidth: 0, marginBottom: 0 }}>
+                <label>From</label>
+                <input
+                  type="date"
+                  value={dateRange.from}
+                  onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
+                  style={{ padding: '12px 0' }}
+                />
+              </div>
+              <div className={`form-group ${styles.dateField}`} style={{ flex: 1, minWidth: 0, marginBottom: 0 }}>
+                <label>To</label>
+                <input
+                  type="date"
+                  value={dateRange.to}
+                  onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
+                  style={{ padding: '12px 0' }}
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Max Report Tabs */}
         {activeTab !== 'pnl' && isMax && (
