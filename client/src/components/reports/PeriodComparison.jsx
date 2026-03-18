@@ -60,7 +60,7 @@ export default function PeriodComparison() {
     <div>
       <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Period Comparison</h2>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, marginBottom: 24 }}>
         <div className="card">
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--color-text-secondary)' }}>Period 1</div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '../hooks/useTransactions';
 import { useCategories } from '../hooks/useCategories';
 import { format } from 'date-fns';
-import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, Camera, ChevronLeft, ChevronRight } from 'lucide-react';
 import Skeleton from '../components/ui/Skeleton';
 import { parseLocalDate } from '../utils/formatters';
 import styles from './Transactions.module.css';
@@ -136,6 +136,12 @@ export default function Transactions() {
           </div>
         )}
 
+        <button
+          className={styles.fabScan}
+          onClick={() => navigate('/scan')}
+        >
+          <Camera size={20} />
+        </button>
         <button
           className={styles.fab}
           onClick={() => navigate('/transactions/new')}
