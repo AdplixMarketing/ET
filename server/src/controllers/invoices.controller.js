@@ -4,6 +4,7 @@ import { generateInvoicePDF } from '../services/invoice.service.js';
 import { sendEmail } from '../services/email.service.js';
 import { invoiceEmailTemplate } from '../templates/invoiceEmail.js';
 import { auditLog } from '../services/audit.service.js';
+import { getUserPlan, FREE_LIMITS, PRO_LIMITS } from '../middleware/planGate.js';
 
 async function getNextInvoiceNumber(userId) {
   const result = await pool.query(
@@ -299,6 +300,25 @@ export async function markPaid(req, res, next) {
 
     const invoice = invoiceResult.rows[0];
     const paidDate = req.body.paid_date || new Date().toISOString().slice(0, 10);
+
+    // Check transaction limit before creating the income transaction
+    const plan = await getUserPlan(req.userId, req);
+    if (plan !== 'max') {
+      const limits = plan === 'pro' ? PRO_LIMITS : FREE_LIMITS;
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+      const countResult = await client.query(
+        'SELECT COUNT(*) FROM transactions WHERE user_id = $1 AND created_at >= $2',
+        [req.userId, startOfMonth]
+      );
+      if (parseInt(countResult.rows[0].count) >= limits.transactions_per_month) {
+        await client.query('ROLLBACK');
+        return res.status(403).json({
+          error: `Transaction limit reached (${limits.transactions_per_month}/month). Upgrade for more.`,
+          upgrade: true,
+        });
+      }
+    }
 
     // Find the "Client Payment" income category for this user
     const catResult = await client.query(
