@@ -623,11 +623,34 @@
 /* ====== FOOTER ====== */
 
 .footer {
-  padding: 28px;
+  padding: 32px 24px;
   text-align: center;
-  font-size: 13px;
-  color: var(--color-text-secondary);
   border-top: 1px solid var(--color-border);
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.footerLinks {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.footerLinks a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footerLinks a:hover {
+  color: var(--color-text);
 }
 
 /* ====== RESPONSIVE ====== */

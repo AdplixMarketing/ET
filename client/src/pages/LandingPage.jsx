@@ -123,6 +123,8 @@ export default function LandingPage() {
           AddFi
         </div>
         <div className={styles.navButtons}>
+          <Link to="/features" className={styles.navLogin}>Features</Link>
+          <Link to="/pricing" className={styles.navLogin}>Pricing</Link>
           <Link to="/login" className={styles.navLogin}>Log In</Link>
           <Link to="/register" className={styles.navSignup}>Sign Up</Link>
         </div>
@@ -265,7 +267,12 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        &copy; {new Date().getFullYear()} AddFi. All rights reserved.
+        <div className={styles.footerLinks}>
+          <Link to="/features">Features</Link>
+          <Link to="/pricing">Pricing</Link>
+          <a href="mailto:support@addfi.co">Contact</a>
+        </div>
+        <p>&copy; {new Date().getFullYear()} AddFi. All rights reserved.</p>
       </footer>
     </div>
   );

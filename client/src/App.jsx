@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import AppShell from './components/layout/AppShell';
 import LandingPage from './pages/LandingPage';
+import Features from './pages/Features';
+import Pricing from './pages/Pricing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -57,6 +59,8 @@ export default function App() {
     <Suspense fallback={<LazyFallback />}>
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
