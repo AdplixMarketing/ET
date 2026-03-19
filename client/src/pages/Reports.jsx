@@ -142,7 +142,7 @@ export default function Reports() {
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-              <div className="form-group" style={{ width: '48%', marginBottom: 0 }}>
+              <div className="form-group" style={{ width: '48.5%', marginBottom: 0 }}>
                 <label>From</label>
                 <input
                   type="date"
@@ -151,7 +151,7 @@ export default function Reports() {
                   style={{ padding: '12px 0', width: '100%' }}
                 />
               </div>
-              <div className="form-group" style={{ width: '48%', marginBottom: 0 }}>
+              <div className="form-group" style={{ width: '48.5%', marginBottom: 0 }}>
                 <label>To</label>
                 <input
                   type="date"
