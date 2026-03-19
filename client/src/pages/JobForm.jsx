@@ -118,12 +118,12 @@ export default function JobForm() {
               </select>
             </div>
 
-            <div style={{ display: 'flex', gap: 12 }}>
-              <div className="form-group" style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div className="form-group">
                 <label>Date *</label>
                 <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required />
               </div>
-              <div className="form-group" style={{ flex: 1, minWidth: 0 }}>
+              <div className="form-group">
                 <label>Time</label>
                 <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} />
               </div>
