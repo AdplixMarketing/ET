@@ -25,6 +25,10 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.25s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .chip:hover {
   border-color: var(--color-primary);
