@@ -120,12 +120,12 @@ export default function JobForm() {
 
             <div className="form-group">
               <label>Date *</label>
-              <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required />
+              <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required style={{ width: '50%' }} />
             </div>
 
             <div className="form-group">
               <label>Time</label>
-              <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} />
+              <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} style={{ width: '50%' }} />
             </div>
 
             {isEdit && (
