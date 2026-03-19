@@ -26,6 +26,7 @@ export default function TransactionForm() {
     category_id: '',
     date: localDate(),
     vendor_or_client: '',
+    client_id: '',
     payment_method: '',
     description: '',
     notes: '',
@@ -56,6 +57,7 @@ export default function TransactionForm() {
           category_id: tx.category_id || '',
           date: tx.date?.slice(0, 10),
           vendor_or_client: tx.vendor_or_client || '',
+          client_id: tx.client_id || '',
           payment_method: tx.payment_method || '',
           description: tx.description || '',
           notes: tx.notes || '',
@@ -92,6 +94,7 @@ export default function TransactionForm() {
       fd.append('date', form.date);
       if (form.category_id) fd.append('category_id', form.category_id);
       if (form.vendor_or_client) fd.append('vendor_or_client', form.vendor_or_client);
+      if (form.client_id) fd.append('client_id', form.client_id);
       if (form.payment_method) fd.append('payment_method', form.payment_method);
       if (form.description) fd.append('description', form.description);
       if (form.notes) fd.append('notes', form.notes);
@@ -101,10 +104,10 @@ export default function TransactionForm() {
         await api.put(`/transactions/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('Transaction updated');
       } else {
-        await api.post('/transactions', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        const createRes = await api.post('/transactions', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('Transaction added');
-        if (res.data.duplicate_warning) {
-          setDuplicateWarning(res.data.duplicate_warning);
+        if (createRes.data.duplicate_warning) {
+          setDuplicateWarning(createRes.data.duplicate_warning);
           return;
         }
       }
@@ -208,9 +211,10 @@ export default function TransactionForm() {
                   value={clients.some((c) => c.name === form.vendor_or_client) ? form.vendor_or_client : '__custom'}
                   onChange={(e) => {
                     if (e.target.value === '__custom') {
-                      setForm({ ...form, vendor_or_client: '' });
+                      setForm({ ...form, vendor_or_client: '', client_id: '' });
                     } else {
-                      setForm({ ...form, vendor_or_client: e.target.value });
+                      const client = clients.find((c) => c.name === e.target.value);
+                      setForm({ ...form, vendor_or_client: e.target.value, client_id: client?.id || '' });
                     }
                   }}
                 >

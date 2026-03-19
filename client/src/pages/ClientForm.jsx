@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Link } from 'lucide-react';
 import { formatPhone } from '../utils/formatters';
+import { format } from 'date-fns';
+import { parseLocalDate } from '../utils/formatters';
 
 export default function ClientForm() {
   const { id } = useParams();
@@ -14,6 +16,7 @@ export default function ClientForm() {
     name: '', email: '', phone: '', company: '', address: '', notes: '',
   });
   const [saving, setSaving] = useState(false);
+  const [linkPrompt, setLinkPrompt] = useState(null);
 
   useEffect(() => {
     if (isEdit) {
@@ -35,11 +38,17 @@ export default function ClientForm() {
       if (isEdit) {
         await api.put(`/clients/${id}`, form);
         toast.success('Client updated');
+        navigate('/clients');
       } else {
-        await api.post('/clients', form);
+        const res = await api.post('/clients', form);
         toast.success('Client created');
+        if (res.data.unlinked_transactions?.length > 0) {
+          setLinkPrompt({ clientId: res.data.id, transactions: res.data.unlinked_transactions });
+          setSaving(false);
+          return;
+        }
+        navigate('/clients');
       }
-      navigate('/clients');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to save');
     } finally {
@@ -98,10 +107,54 @@ export default function ClientForm() {
               <textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Internal notes about this client" />
             </div>
           </div>
-          <button className="btn btn-primary btn-full" disabled={saving}>
+          <button className="btn btn-primary btn-full" disabled={saving || linkPrompt}>
             {saving ? 'Saving...' : isEdit ? 'Update Client' : 'Create Client'}
           </button>
         </form>
+
+        {linkPrompt && (
+          <div style={{ margin: '16px 0', padding: 16, background: 'rgba(0, 122, 255, 0.08)', border: '1px solid var(--color-primary)', borderRadius: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <Link size={16} style={{ color: 'var(--color-primary)' }} />
+              <span style={{ fontWeight: 600, fontSize: 14 }}>Link existing transactions?</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+              We found {linkPrompt.transactions.length} transaction{linkPrompt.transactions.length > 1 ? 's' : ''} matching "{form.name}". Would you like to link them to this client?
+            </p>
+            {linkPrompt.transactions.map((tx) => (
+              <div key={tx.id} style={{ fontSize: 13, padding: '6px 0', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
+                <span>{tx.description || tx.type} &middot; {format(parseLocalDate(tx.date), 'MMM d, yyyy')}</span>
+                <span style={{ fontWeight: 600 }}>${parseFloat(tx.amount).toFixed(2)}</span>
+              </div>
+            ))}
+            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1 }}
+                onClick={async () => {
+                  try {
+                    await api.post(`/clients/${linkPrompt.clientId}/link-transactions`, {
+                      transaction_ids: linkPrompt.transactions.map((t) => t.id),
+                    });
+                    toast.success('Transactions linked');
+                  } catch {
+                    toast.error('Failed to link');
+                  }
+                  navigate('/clients');
+                }}
+              >
+                Yes, link them
+              </button>
+              <button
+                className="btn btn-outline"
+                style={{ flex: 1 }}
+                onClick={() => navigate('/clients')}
+              >
+                No, skip
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

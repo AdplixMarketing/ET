@@ -122,7 +122,7 @@ export async function deleteReceipt(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const { type, amount, category_id, date, description, vendor_or_client, payment_method, notes, receipt_path: bodyReceiptPath } = req.body;
+    const { type, amount, category_id, date, description, vendor_or_client, client_id, payment_method, notes, receipt_path: bodyReceiptPath } = req.body;
     const receipt_path = req.file ? req.file.path : (bodyReceiptPath || null);
 
     // Auto-categorize if no category provided
@@ -136,9 +136,9 @@ export async function create(req, res, next) {
     const duplicates = await checkDuplicate(req.userId, { amount, date, vendor_or_client });
 
     const result = await pool.query(
-      `INSERT INTO transactions (user_id, type, amount, category_id, date, description, vendor_or_client, payment_method, notes, receipt_path)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [req.userId, type, amount, finalCategoryId, date, description || null, vendor_or_client || null, payment_method || null, notes || null, receipt_path]
+      `INSERT INTO transactions (user_id, type, amount, category_id, date, description, vendor_or_client, client_id, payment_method, notes, receipt_path)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [req.userId, type, amount, finalCategoryId, date, description || null, vendor_or_client || null, client_id || null, payment_method || null, notes || null, receipt_path]
     );
 
     const response = result.rows[0];
@@ -153,7 +153,7 @@ export async function create(req, res, next) {
 
 export async function update(req, res, next) {
   try {
-    const { type, amount, category_id, date, description, vendor_or_client, payment_method, notes } = req.body;
+    const { type, amount, category_id, date, description, vendor_or_client, client_id, payment_method, notes } = req.body;
     const receipt_path = req.file ? req.file.path : undefined;
 
     const fields = [];
@@ -166,6 +166,7 @@ export async function update(req, res, next) {
     if (date !== undefined) { fields.push(`date = $${idx++}`); params.push(date); }
     if (description !== undefined) { fields.push(`description = $${idx++}`); params.push(description); }
     if (vendor_or_client !== undefined) { fields.push(`vendor_or_client = $${idx++}`); params.push(vendor_or_client); }
+    if (client_id !== undefined) { fields.push(`client_id = $${idx++}`); params.push(client_id || null); }
     if (payment_method !== undefined) { fields.push(`payment_method = $${idx++}`); params.push(payment_method); }
     if (notes !== undefined) { fields.push(`notes = $${idx++}`); params.push(notes); }
     if (receipt_path !== undefined) { fields.push(`receipt_path = $${idx++}`); params.push(receipt_path); }
