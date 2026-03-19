@@ -341,7 +341,8 @@ a:hover { color: var(--color-primary-dark); }
   .form-group input,
   .form-group select,
   .form-group textarea { padding: 12px 14px; font-size: 14px; }
-  .form-group input[type="date"] { padding: 12px 0; }
+  .form-group input[type="date"],
+  .form-group input[type="time"] { padding: 12px 8px; max-width: 100%; overflow: hidden; }
 }
 
 @media (min-width: 768px) {
