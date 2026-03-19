@@ -1,17 +1,18 @@
 .presets {
   display: flex;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 18px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
 }
 
 .preset {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 0;
+  padding: 10px 16px;
   border: 2px solid var(--color-border);
   border-radius: 24px;
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -21,14 +22,15 @@
 }
 
 .preset:hover {
-  background: var(--color-surface-hover);
   border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .presetActive {
-  background: var(--color-primary) !important;
+  background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%) !important;
   color: #fff !important;
-  border-color: var(--color-primary) !important;
+  border-color: transparent !important;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
 }
 
 .dateRow {
