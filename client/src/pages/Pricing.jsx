@@ -206,7 +206,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Comparison Table */}
+      {/* Comparison Table — desktop */}
       <section className={styles.compareSection}>
         <Reveal>
           <h2 className={styles.sectionTitle}>Compare plans in detail</h2>
@@ -255,6 +255,40 @@ export default function Pricing() {
             </table>
           </div>
         </Reveal>
+
+        {/* Comparison — mobile cards */}
+        <div className={styles.mobileCompare}>
+          {comparisonCategories.map((cat) => (
+            <Reveal key={cat.category}>
+              <div className={styles.mobileCatTitle}>{cat.category}</div>
+              {cat.rows.map((row) => (
+                <div key={row.feature} className={styles.mobileRow}>
+                  <div className={styles.mobileFeature}>{row.feature}</div>
+                  <div className={styles.mobilePlans}>
+                    <div className={styles.mobilePlan}>
+                      <span className={styles.mobilePlanLabel}>Free</span>
+                      {typeof row.free === 'boolean' ? (
+                        row.free ? <Check size={16} className={styles.checkMark} /> : <X size={16} className={styles.xMark} />
+                      ) : <span className={styles.textValue}>{row.free}</span>}
+                    </div>
+                    <div className={styles.mobilePlan}>
+                      <span className={`${styles.mobilePlanLabel} ${styles.planColPro}`}>Pro</span>
+                      {typeof row.pro === 'boolean' ? (
+                        row.pro ? <Check size={16} className={styles.checkMark} /> : <X size={16} className={styles.xMark} />
+                      ) : <span className={styles.textValue}>{row.pro}</span>}
+                    </div>
+                    <div className={styles.mobilePlan}>
+                      <span className={`${styles.mobilePlanLabel} ${styles.planColMax}`}>Max</span>
+                      {typeof row.max === 'boolean' ? (
+                        row.max ? <Check size={16} className={styles.checkMark} /> : <X size={16} className={styles.xMark} />
+                      ) : <span className={styles.textValueMax}>{row.max}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </Reveal>
+          ))}
+        </div>
       </section>
 
       {/* FAQ */}
