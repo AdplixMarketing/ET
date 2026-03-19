@@ -118,14 +118,15 @@ export default function JobForm() {
               </select>
             </div>
 
-            <div className="form-group">
-              <label>Date *</label>
-              <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required style={{ width: '99%' }} />
-            </div>
-
-            <div className="form-group">
-              <label>Time</label>
-              <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} style={{ width: '99%' }} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div className="form-group" style={{ width: '49%' }}>
+                <label>Date *</label>
+                <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required style={{ width: '100%' }} />
+              </div>
+              <div className="form-group" style={{ width: '49%' }}>
+                <label>Time</label>
+                <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} style={{ width: '100%' }} />
+              </div>
             </div>
 
             {isEdit && (

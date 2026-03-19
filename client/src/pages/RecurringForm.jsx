@@ -138,13 +138,15 @@ export default function RecurringForm() {
                 {FREQUENCIES.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
               </select>
             </div>
-            <div className="form-group">
-              <label>Next Run Date</label>
-              <input type="date" value={nextRunDate} onChange={e => setNextRunDate(e.target.value)} required style={{ padding: '12px 0', width: '99%' }} />
-            </div>
-            <div className="form-group">
-              <label>End Date (optional)</label>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: '12px 0', width: '99%' }} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div className="form-group" style={{ width: '49%' }}>
+                <label>Next Run Date</label>
+                <input type="date" value={nextRunDate} onChange={e => setNextRunDate(e.target.value)} required style={{ padding: '12px 0', width: '100%' }} />
+              </div>
+              <div className="form-group" style={{ width: '49%' }}>
+                <label>End Date (optional)</label>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: '12px 0', width: '100%' }} />
+              </div>
             </div>
           </div>
 
@@ -152,16 +154,18 @@ export default function RecurringForm() {
           {entityType === 'transaction' && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Transaction Details</h3>
-              <div className="form-group">
-                <label>Amount</label>
-                <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(formatMoney(e.target.value))} required placeholder="0.00" style={{ width: '99%' }} />
-              </div>
-              <div className="form-group">
-                <label>Type</label>
-                <select value={txType} onChange={e => setTxType(e.target.value)} style={{ width: '99%' }}>
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>
-                </select>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div className="form-group" style={{ width: '49%' }}>
+                  <label>Amount</label>
+                  <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(formatMoney(e.target.value))} required placeholder="0.00" style={{ width: '100%' }} />
+                </div>
+                <div className="form-group" style={{ width: '49%' }}>
+                  <label>Type</label>
+                  <select value={txType} onChange={e => setTxType(e.target.value)} style={{ width: '100%' }}>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </div>
               </div>
               <div className="form-group">
                 <label>Description</label>
@@ -178,13 +182,15 @@ export default function RecurringForm() {
           {entityType === 'invoice' && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Invoice Details</h3>
-              <div className="form-group">
-                <label>Client Name</label>
-                <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} required placeholder="Client name" style={{ width: '99%' }} />
-              </div>
-              <div className="form-group">
-                <label>Client Email</label>
-                <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="client@email.com" style={{ width: '99%' }} />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div className="form-group" style={{ width: '49%' }}>
+                  <label>Client Name</label>
+                  <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} required placeholder="Client name" style={{ width: '100%' }} />
+                </div>
+                <div className="form-group" style={{ width: '49%' }}>
+                  <label>Client Email</label>
+                  <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="client@email.com" style={{ width: '100%' }} />
+                </div>
               </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
