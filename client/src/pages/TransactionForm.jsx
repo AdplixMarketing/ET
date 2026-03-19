@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCategories } from '../hooks/useCategories';
 import { useTransactions } from '../hooks/useTransactions';
+import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Trash2, Upload, Image, ExternalLink, X, AlertTriangle } from 'lucide-react';
@@ -16,6 +17,7 @@ export default function TransactionForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { deleteTransaction } = useTransactions();
+  const { user } = useAuth();
   const isEdit = Boolean(id);
 
   const [type, setType] = useState('expense');
@@ -34,8 +36,15 @@ export default function TransactionForm() {
   const [saving, setSaving] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [duplicateWarning, setDuplicateWarning] = useState(null);
+  const [clients, setClients] = useState([]);
 
   const { categories } = useCategories(type);
+
+  useEffect(() => {
+    if (user?.plan === 'max') {
+      api.get('/clients').then((res) => setClients(res.data)).catch(() => {});
+    }
+  }, [user]);
 
   useEffect(() => {
     if (isEdit) {
@@ -193,12 +202,29 @@ export default function TransactionForm() {
 
           <div className="form-group">
             <label>{type === 'income' ? 'Client / Source' : 'Vendor'}</label>
-            <input
-              type="text"
-              placeholder={type === 'income' ? 'Who paid you?' : 'Where did you spend?'}
-              value={form.vendor_or_client}
-              onChange={(e) => setForm({ ...form, vendor_or_client: e.target.value })}
-            />
+            {type === 'income' && clients.length > 0 ? (
+              <>
+                <input
+                  type="text"
+                  list="client-list"
+                  placeholder="Type or select a client"
+                  value={form.vendor_or_client}
+                  onChange={(e) => setForm({ ...form, vendor_or_client: e.target.value })}
+                />
+                <datalist id="client-list">
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.name} />
+                  ))}
+                </datalist>
+              </>
+            ) : (
+              <input
+                type="text"
+                placeholder={type === 'income' ? 'Who paid you?' : 'Where did you spend?'}
+                value={form.vendor_or_client}
+                onChange={(e) => setForm({ ...form, vendor_or_client: e.target.value })}
+              />
+            )}
           </div>
 
           <div className="form-group">
