@@ -35,6 +35,8 @@ const Businesses = lazy(() => import('./pages/Businesses'));
 const BusinessForm = lazy(() => import('./pages/BusinessForm'));
 const Automation = lazy(() => import('./pages/Automation'));
 const AutomationRuleForm = lazy(() => import('./pages/AutomationRuleForm'));
+const Jobs = lazy(() => import('./pages/Jobs'));
+const JobForm = lazy(() => import('./pages/JobForm'));
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -103,6 +105,9 @@ export default function App() {
           <Route path="/automation" element={<Automation />} />
           <Route path="/automation/new" element={<AutomationRuleForm />} />
           <Route path="/automation/:id" element={<AutomationRuleForm />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/new" element={<JobForm />} />
+          <Route path="/jobs/:id" element={<JobForm />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

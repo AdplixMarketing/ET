@@ -25,6 +25,7 @@ import businessesRoutes from './routes/businesses.routes.js';
 import automationRoutes from './routes/automation.routes.js';
 import recurringRoutes from './routes/recurring.routes.js';
 import importsRoutes from './routes/imports.routes.js';
+import jobsRoutes from './routes/jobs.routes.js';
 import { webhook } from './controllers/billing.controller.js';
 import errorHandler from './middleware/errorHandler.js';
 import authenticate from './middleware/auth.js';
@@ -125,6 +126,7 @@ app.use('/api/businesses', businessesRoutes);
 app.use('/api/automation', automationRoutes);
 app.use('/api/recurring', recurringRoutes);
 app.use('/api/imports', importsRoutes);
+app.use('/api/jobs', jobsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

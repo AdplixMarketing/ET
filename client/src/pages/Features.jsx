@@ -116,6 +116,11 @@ const maxFeatures = [
     title: 'Multi-Business Support',
     desc: 'Run multiple businesses from one account. Each business gets its own transactions, invoices, clients, and reports. Switch between them instantly.',
   },
+  {
+    icon: Clock,
+    title: 'Job Scheduling',
+    desc: 'Book and manage jobs on a schedule. Assign clients, set dates and times, track job status from scheduled to completed, and link finished jobs to invoices.',
+  },
 ];
 
 const useCases = [

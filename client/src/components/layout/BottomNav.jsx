@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   Home, ArrowLeftRight, BarChart3, Settings,
-  FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X,
+  FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X, CalendarCheck,
 } from 'lucide-react';
 import styles from './BottomNav.module.css';
 
@@ -35,6 +35,7 @@ export default function BottomNav() {
 
   const maxMenuItems = [
     { to: '/invoices', icon: FileText, label: 'Invoices' },
+    { to: '/jobs', icon: CalendarCheck, label: 'Schedule' },
     { to: '/clients', icon: Users, label: 'Clients' },
     { to: '/templates', icon: LayoutTemplate, label: 'Templates' },
     { to: '/recurring', icon: Repeat, label: 'Recurring' },

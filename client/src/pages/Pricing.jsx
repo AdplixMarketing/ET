@@ -111,6 +111,7 @@ const comparisonCategories = [
       { feature: 'Multi-business support', free: false, pro: false, max: true },
       { feature: 'Automation rules', free: false, pro: false, max: true },
       { feature: 'Stripe payment processing', free: false, pro: false, max: true },
+      { feature: 'Job scheduling', free: false, pro: false, max: true },
     ],
   },
   {
