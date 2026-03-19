@@ -177,7 +177,7 @@ export default function InvoiceForm() {
                 type="date"
                 value={form.due_date}
                 onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-                style={{ padding: '12px 0', width: '50%' }}
+                style={{ padding: '12px 0', width: '99%' }}
               />
             </div>
           </div>

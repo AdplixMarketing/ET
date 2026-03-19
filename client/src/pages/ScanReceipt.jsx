@@ -146,7 +146,7 @@ export default function ScanReceipt() {
                 type="date"
                 value={result.date}
                 onChange={(e) => setResult({ ...result, date: e.target.value })}
-                style={{ padding: '12px 0', width: '50%' }}
+                style={{ padding: '12px 0', width: '99%' }}
               />
             </div>
 

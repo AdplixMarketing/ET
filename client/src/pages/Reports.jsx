@@ -141,23 +141,23 @@ export default function Reports() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24, maxWidth: '100%' }}>
-              <div className={`form-group ${styles.dateField}`} style={{ flex: 1, minWidth: 0, marginBottom: 0 }}>
+            <div style={{ marginBottom: 24 }}>
+              <div className="form-group">
                 <label>From</label>
                 <input
                   type="date"
                   value={dateRange.from}
                   onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
-                  style={{ padding: '12px 0' }}
+                  style={{ padding: '12px 0', width: '99%' }}
                 />
               </div>
-              <div className={`form-group ${styles.dateField}`} style={{ flex: 1, minWidth: 0, marginBottom: 0 }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>To</label>
                 <input
                   type="date"
                   value={dateRange.to}
                   onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
-                  style={{ padding: '12px 0' }}
+                  style={{ padding: '12px 0', width: '99%' }}
                 />
               </div>
             </div>
