@@ -26,10 +26,11 @@
   color: var(--color-primary);
 }
 
-.presetActive {
-  background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%) !important;
-  color: #fff !important;
-  border-color: transparent !important;
+.presetActive,
+.presetActive:hover {
+  background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%);
+  color: #fff;
+  border-color: transparent;
   box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
 }
 

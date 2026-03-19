@@ -30,7 +30,8 @@
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
-.chipActive {
+.chipActive,
+.chipActive:hover {
   background: linear-gradient(135deg, #4A90E2 0%, #6C5CE7 100%);
   color: white;
   border-color: transparent;
