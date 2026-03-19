@@ -120,32 +120,30 @@ export default function JobForm() {
               </select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div className="form-group">
-                <label>Date *</label>
-                <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required />
-              </div>
-              {isEdit && (
-                <div className="form-group">
-                  <label>Status</label>
-                  <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                    {statusOptions.map((s) => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
+            <div className="form-group">
+              <label>Date *</label>
+              <input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} required />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {isEdit && (
               <div className="form-group">
-                <label>Start Time</label>
-                <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} />
+                <label>Status</label>
+                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                  {statusOptions.map((s) => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
+                </select>
               </div>
-              <div className="form-group">
-                <label>End Time</label>
-                <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} />
-              </div>
+            )}
+
+            <div className="form-group">
+              <label>Start Time</label>
+              <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} />
+            </div>
+
+            <div className="form-group">
+              <label>End Time</label>
+              <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} />
             </div>
 
             <div className="form-group">
