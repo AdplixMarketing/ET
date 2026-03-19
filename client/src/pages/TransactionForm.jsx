@@ -204,18 +204,30 @@ export default function TransactionForm() {
             <label>{type === 'income' ? 'Client / Source' : 'Vendor'}</label>
             {type === 'income' && clients.length > 0 ? (
               <>
-                <input
-                  type="text"
-                  list="client-list"
-                  placeholder="Type or select a client"
-                  value={form.vendor_or_client}
-                  onChange={(e) => setForm({ ...form, vendor_or_client: e.target.value })}
-                />
-                <datalist id="client-list">
+                <select
+                  value={clients.some((c) => c.name === form.vendor_or_client) ? form.vendor_or_client : '__custom'}
+                  onChange={(e) => {
+                    if (e.target.value === '__custom') {
+                      setForm({ ...form, vendor_or_client: '' });
+                    } else {
+                      setForm({ ...form, vendor_or_client: e.target.value });
+                    }
+                  }}
+                >
+                  <option value="__custom">Type manually...</option>
                   {clients.map((c) => (
-                    <option key={c.id} value={c.name} />
+                    <option key={c.id} value={c.name}>{c.name}</option>
                   ))}
-                </datalist>
+                </select>
+                {!clients.some((c) => c.name === form.vendor_or_client) && (
+                  <input
+                    type="text"
+                    placeholder="Who paid you?"
+                    value={form.vendor_or_client}
+                    onChange={(e) => setForm({ ...form, vendor_or_client: e.target.value })}
+                    style={{ marginTop: 8 }}
+                  />
+                )}
               </>
             ) : (
               <input
