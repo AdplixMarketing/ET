@@ -9,9 +9,9 @@ import styles from './Jobs.module.css';
 
 const statusFilters = [
   { key: '', label: 'All' },
-  { key: 'scheduled', label: 'Scheduled' },
-  { key: 'in_progress', label: 'In Progress' },
-  { key: 'completed', label: 'Completed' },
+  { key: 'scheduled', label: 'Upcoming' },
+  { key: 'in_progress', label: 'Active' },
+  { key: 'completed', label: 'Done' },
   { key: 'cancelled', label: 'Cancelled' },
 ];
 
