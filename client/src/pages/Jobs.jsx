@@ -141,7 +141,6 @@ export default function Jobs() {
                         <span className={styles.meta}>
                           {job.client_name ? `${job.client_name} · ` : ''}
                           {job.scheduled_time ? formatTime(job.scheduled_time) : 'No time set'}
-                          {job.end_time ? ` - ${formatTime(job.end_time)}` : ''}
                           {job.location ? ` · ${job.location}` : ''}
                         </span>
                       </div>

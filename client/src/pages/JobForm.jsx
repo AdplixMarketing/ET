@@ -17,8 +17,8 @@ export default function JobForm() {
   const isEdit = Boolean(id);
 
   const [form, setForm] = useState({
-    title: '', description: '', client_id: '', scheduled_date: '', scheduled_time: '',
-    end_time: '', location: '', notes: '', status: 'scheduled',
+    title: '', client_id: '', scheduled_date: '', scheduled_time: '',
+    location: '', notes: '', status: 'scheduled',
   });
   const [clients, setClients] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -33,11 +33,9 @@ export default function JobForm() {
         const j = res.data;
         setForm({
           title: j.title || '',
-          description: j.description || '',
           client_id: j.client_id || '',
           scheduled_date: j.scheduled_date?.slice(0, 10) || '',
           scheduled_time: j.scheduled_time?.slice(0, 5) || '',
-          end_time: j.end_time?.slice(0, 5) || '',
           location: j.location || '',
           notes: j.notes || '',
           status: j.status || 'scheduled',
@@ -137,13 +135,8 @@ export default function JobForm() {
             )}
 
             <div className="form-group">
-              <label>Start Time</label>
+              <label>Time</label>
               <input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} />
-            </div>
-
-            <div className="form-group">
-              <label>End Time</label>
-              <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} />
             </div>
 
             <div className="form-group">
@@ -152,13 +145,8 @@ export default function JobForm() {
             </div>
 
             <div className="form-group">
-              <label>Description</label>
-              <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What needs to be done" />
-            </div>
-
-            <div className="form-group">
               <label>Notes</label>
-              <textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Internal notes (not visible to client)" />
+              <textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Job details, special instructions, etc." />
             </div>
           </div>
 
