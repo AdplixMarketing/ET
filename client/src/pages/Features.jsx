@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Camera, FileText, BarChart3, ArrowRight, Users, LayoutTemplate,
   Repeat, Upload, Zap, Building2, CreditCard, TrendingUp, Shield,
-  Clock, Smartphone, Receipt, PieChart, CalendarCheck,
+  Clock, Smartphone, Receipt, PieChart, CalendarCheck, Menu, X,
 } from 'lucide-react';
 import styles from './Features.module.css';
 
@@ -142,6 +142,8 @@ const useCases = [
 ];
 
 export default function Features() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div className={styles.page}>
       {/* Nav */}
@@ -151,10 +153,21 @@ export default function Features() {
           AddFi
         </Link>
         <div className={styles.navButtons}>
+          <Link to="/pricing" className={styles.navLogin}>Pricing</Link>
           <Link to="/login" className={styles.navLogin}>Log In</Link>
           <Link to="/register" className={styles.navSignup}>Sign Up</Link>
         </div>
+        <button className={styles.menuBtn} onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </nav>
+      {menuOpen && (
+        <div className={styles.mobileMenu}>
+          <Link to="/pricing" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>Pricing</Link>
+          <Link to="/login" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>Log In</Link>
+          <Link to="/register" className={styles.mobileSignup} onClick={() => setMenuOpen(false)}>Sign Up</Link>
+        </div>
+      )}
 
       {/* Hero */}
       <section className={styles.hero}>
