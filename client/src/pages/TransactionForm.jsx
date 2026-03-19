@@ -187,7 +187,7 @@ export default function TransactionForm() {
               type="date"
               value={form.date}
               onChange={(e) => setForm({ ...form, date: e.target.value })}
-              style={{ padding: '12px 0' }}
+              style={{ padding: '12px 0', width: '50%' }}
             />
           </div>
 
