@@ -52,11 +52,22 @@ export function generateInvoicePDF(invoice, user) {
     // Bill To (left)
     doc.fontSize(8).fillColor('#4A90E2').font('Helvetica-Bold')
       .text('BILL TO', 50, infoY);
-    doc.fontSize(13).fillColor('#1C1C1E').font('Helvetica-Bold')
-      .text(invoice.client_name, 50, infoY + 16);
+    let billToY = infoY + 16;
+    if (invoice.client_company) {
+      doc.fontSize(13).fillColor('#1C1C1E').font('Helvetica-Bold')
+        .text(invoice.client_company, 50, billToY);
+      billToY += 18;
+      doc.fontSize(9).fillColor('#8E8E93').font('Helvetica')
+        .text(invoice.client_name, 50, billToY);
+      billToY += 14;
+    } else {
+      doc.fontSize(13).fillColor('#1C1C1E').font('Helvetica-Bold')
+        .text(invoice.client_name, 50, billToY);
+      billToY += 18;
+    }
     if (invoice.client_email) {
       doc.fontSize(9).fillColor('#8E8E93').font('Helvetica')
-        .text(invoice.client_email, 50, infoY + 34);
+        .text(invoice.client_email, 50, billToY);
     }
 
     // Dates (right side, stacked)

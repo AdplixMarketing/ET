@@ -230,6 +230,17 @@ export async function markSent(req, res, next) {
     );
     const user = userResult.rows[0];
 
+    // Look up client company name if linked to a client
+    if (invoice.client_id) {
+      const clientResult = await pool.query(
+        'SELECT company FROM clients WHERE id = $1 AND user_id = $2',
+        [invoice.client_id, req.userId]
+      );
+      if (clientResult.rows.length > 0 && clientResult.rows[0].company) {
+        invoice.client_company = clientResult.rows[0].company;
+      }
+    }
+
     // If client has email, send the invoice
     if (invoice.client_email) {
       const items = await pool.query(
@@ -381,12 +392,19 @@ export async function downloadPDF(req, res, next) {
     if (invoiceResult.rows.length === 0) return res.status(404).json({ error: 'Invoice not found' });
 
     const invoice = invoiceResult.rows[0];
-    const [itemsRes, userResult] = await Promise.all([
+    const queries = [
       pool.query('SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY sort_order', [invoice.id]),
       pool.query('SELECT business_name, email, business_address, business_phone, currency FROM users WHERE id = $1', [req.userId]),
-    ]);
-    invoice.items = itemsRes.rows;
-    const user = userResult.rows[0];
+    ];
+    if (invoice.client_id) {
+      queries.push(pool.query('SELECT company FROM clients WHERE id = $1 AND user_id = $2', [invoice.client_id, req.userId]));
+    }
+    const results = await Promise.all(queries);
+    invoice.items = results[0].rows;
+    const user = results[1].rows[0];
+    if (results[2]?.rows?.[0]?.company) {
+      invoice.client_company = results[2].rows[0].company;
+    }
 
     const pdfBuffer = await generateInvoicePDF(invoice, user);
 
