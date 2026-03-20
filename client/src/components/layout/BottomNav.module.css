@@ -3,16 +3,15 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  height: var(--nav-height);
   background: var(--nav-bg);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid var(--color-border);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-around;
-  padding-top: 8px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0);
   z-index: 100;
 }
 
