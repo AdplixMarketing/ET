@@ -131,7 +131,7 @@ export default function Settings() {
           <h3 className={styles.sectionTitle}>Subscription</h3>
           {user?.plan === 'max' ? (
             <div>
-              <div className={styles.planBadge} style={{ background: 'linear-gradient(135deg, #FF9500, #FF6B6B)' }}>
+              <div className={styles.planBadge} style={{ background: 'linear-gradient(135deg, #FF9500, #FF6B6B)', color: '#fff', border: 'none' }}>
                 <Crown size={16} /> AddFi Max
               </div>
               {subscription?.subscription?.current_period_end && (
