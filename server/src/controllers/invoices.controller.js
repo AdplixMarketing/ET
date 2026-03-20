@@ -242,6 +242,7 @@ export async function markSent(req, res, next) {
 
       await sendEmail({
         to: invoice.client_email,
+        replyTo: user.email,
         subject: `Invoice ${invoice.invoice_number} from ${user.business_name || 'AddFi'}`,
         html: invoiceEmailTemplate({
           invoiceNumber: invoice.invoice_number,

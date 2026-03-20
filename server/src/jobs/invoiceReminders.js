@@ -11,7 +11,7 @@ export function startInvoiceReminderJob() {
       const result = await pool.query(
         `SELECT i.id, i.invoice_number, i.client_name, i.client_email, i.total, i.due_date,
                 i.portal_token, i.portal_payment_enabled,
-                u.id as user_id, u.business_name, u.plan
+                u.id as user_id, u.email as user_email, u.business_name, u.plan
          FROM invoices i
          JOIN users u ON i.user_id = u.id
          WHERE i.status = 'overdue'
@@ -69,6 +69,7 @@ export function startInvoiceReminderJob() {
         try {
           await sendEmail({
             to: inv.client_email,
+            replyTo: inv.user_email,
             subject: `Payment Reminder: Invoice ${inv.invoice_number} - ${total} overdue`,
             html,
           });

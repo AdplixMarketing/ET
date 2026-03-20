@@ -6,10 +6,11 @@ const FROM_NAME = 'AddFi';
 let transporter = null;
 
 if (process.env.SMTP_HOST) {
+  const port = parseInt(process.env.SMTP_PORT) || 587;
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 465,
-    secure: true,
+    port,
+    secure: port === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -17,7 +18,7 @@ if (process.env.SMTP_HOST) {
   });
 }
 
-export async function sendEmail({ to, subject, html, attachments }) {
+export async function sendEmail({ to, subject, html, attachments, replyTo }) {
   if (!transporter) {
     console.log(`[Email] No SMTP configured. Would send to ${to}: ${subject}`);
     return;
@@ -29,6 +30,10 @@ export async function sendEmail({ to, subject, html, attachments }) {
     subject,
     html,
   };
+
+  if (replyTo) {
+    msg.replyTo = replyTo;
+  }
 
   if (attachments) {
     msg.attachments = attachments.map((a) => ({

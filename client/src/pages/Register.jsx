@@ -86,6 +86,11 @@ export default function Register() {
         <p className={styles.link}>
           Already have an account? <Link to="/login">Sign in</Link>
         </p>
+        <p style={{ fontSize: 11, color: 'var(--color-text-secondary)', textAlign: 'center', marginTop: 12 }}>
+          By creating an account, you agree to our{' '}
+          <Link to="/terms" style={{ color: 'var(--color-primary)' }}>Terms of Service</Link> and{' '}
+          <Link to="/privacy" style={{ color: 'var(--color-primary)' }}>Privacy Policy</Link>.
+        </p>
       </div>
     </div>
   );

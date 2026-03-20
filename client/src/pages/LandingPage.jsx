@@ -284,6 +284,8 @@ export default function LandingPage() {
           <Link to="/features">Features</Link>
           <Link to="/pricing">Pricing</Link>
           <a href="mailto:support@addfi.co">Contact</a>
+          <Link to="/terms">Terms</Link>
+          <Link to="/privacy">Privacy</Link>
         </div>
         <p>&copy; {new Date().getFullYear()} AddFi. All rights reserved.</p>
       </footer>
