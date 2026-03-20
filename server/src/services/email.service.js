@@ -1,26 +1,17 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'support@addfi.co';
 const FROM_NAME = 'AddFi';
 
-let transporter = null;
+let resend = null;
 
-if (process.env.SMTP_HOST) {
-  const port = parseInt(process.env.SMTP_PORT) || 587;
-  transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
 }
 
 export async function sendEmail({ to, subject, html, attachments, replyTo }) {
-  if (!transporter) {
-    console.log(`[Email] No SMTP configured. Would send to ${to}: ${subject}`);
+  if (!resend) {
+    console.log(`[Email] No RESEND_API_KEY configured. Would send to ${to}: ${subject}`);
     return;
   }
 
@@ -38,13 +29,13 @@ export async function sendEmail({ to, subject, html, attachments, replyTo }) {
   if (attachments) {
     msg.attachments = attachments.map((a) => ({
       filename: a.filename,
-      content: a.content,
+      content: Buffer.isBuffer(a.content) ? a.content : Buffer.from(a.content, 'base64'),
       contentType: a.type,
     }));
   }
 
   try {
-    await transporter.sendMail(msg);
+    await resend.emails.send(msg);
     console.log(`[Email] Sent to ${to}: ${subject}`);
   } catch (err) {
     console.error(`[Email] Failed to send to ${to}:`, err.message);
