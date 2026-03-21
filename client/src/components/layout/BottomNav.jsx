@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   Home, ArrowLeftRight, BarChart3, Settings,
-  FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X, CalendarCheck,
+  FileText, Users, LayoutTemplate, Repeat, Upload, Zap, Building2, X, CalendarCheck, Package,
 } from 'lucide-react';
 import styles from './BottomNav.module.css';
 
@@ -31,10 +31,18 @@ export default function BottomNav() {
     };
   }, [menuOpen]);
 
+  const isPro = user?.plan === 'pro';
   const isMax = user?.plan === 'max';
+  const isPaid = isPro || isMax;
+
+  const proMenuItems = [
+    { to: '/invoices', icon: FileText, label: 'Invoices' },
+    { to: '/products', icon: Package, label: 'Products' },
+  ];
 
   const maxMenuItems = [
     { to: '/invoices', icon: FileText, label: 'Invoices' },
+    { to: '/products', icon: Package, label: 'Products' },
     { to: '/jobs', icon: CalendarCheck, label: 'Schedule' },
     { to: '/clients', icon: Users, label: 'Clients' },
     { to: '/templates', icon: LayoutTemplate, label: 'Templates' },
@@ -44,7 +52,8 @@ export default function BottomNav() {
     { to: '/businesses', icon: Building2, label: 'Businesses' },
   ];
 
-  const centerActive = isMax && maxMenuItems.some((item) => location.pathname.startsWith(item.to));
+  const menuItems = isMax ? maxMenuItems : proMenuItems;
+  const centerActive = isPaid && menuItems.some((item) => location.pathname.startsWith(item.to));
 
   return (
     <nav className={styles.nav}>
@@ -58,12 +67,12 @@ export default function BottomNav() {
         <span>Transactions</span>
       </NavLink>
 
-      {/* Center: direct Invoices link for free/pro, drop-up menu for Max */}
-      {isMax ? (
+      {/* Center: drop-up menu for Pro/Max, direct Invoices link for free */}
+      {isPaid ? (
         <div className={styles.centerWrap} ref={menuRef}>
           {menuOpen && (
             <div className={styles.dropUp}>
-              {maxMenuItems.map(({ to, icon: Icon, label }) => (
+              {menuItems.map(({ to, icon: Icon, label }) => (
                 <button
                   key={to}
                   className={`${styles.dropUpItem} ${location.pathname.startsWith(to) ? styles.dropUpActive : ''}`}

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Package } from 'lucide-react';
 import styles from './InvoiceForm.module.css';
 import { formatMoney, parseMoney, localDate } from '../utils/formatters';
 
@@ -25,6 +25,7 @@ export default function InvoiceForm() {
     portal_payment_enabled: false,
   });
   const [templates, setTemplates] = useState([]);
+  const [productsList, setProductsList] = useState([]);
 
   const [items, setItems] = useState([
     { description: '', quantity: '1', rate: '' },
@@ -33,6 +34,10 @@ export default function InvoiceForm() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // Fetch products for Pro+ users
+    if (user?.plan === 'pro' || user?.plan === 'max') {
+      api.get('/products').then((res) => setProductsList(res.data)).catch(() => {});
+    }
     // Fetch clients and templates for Max users
     if (user?.plan === 'max') {
       api.get('/clients').then((res) => setClientsList(res.data)).catch(() => {});
@@ -229,9 +234,34 @@ export default function InvoiceForm() {
               </div>
             ))}
 
-            <button type="button" className="btn btn-outline" onClick={addItem} style={{ marginTop: 8 }}>
-              <Plus size={16} /> Add Item
-            </button>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-outline" onClick={addItem}>
+                <Plus size={16} /> Add Item
+              </button>
+              {productsList.length > 0 && (
+                <select
+                  className={styles.productSelect}
+                  value=""
+                  onChange={(e) => {
+                    const product = productsList.find((p) => p.id === e.target.value);
+                    if (product) {
+                      setItems([...items, {
+                        description: product.description || product.name,
+                        quantity: '1',
+                        rate: formatMoney(String(parseFloat(product.rate))),
+                      }]);
+                    }
+                  }}
+                >
+                  <option value="">+ Add saved product</option>
+                  {productsList.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} — ${parseFloat(p.rate).toFixed(2)}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
 
           {/* Totals */}

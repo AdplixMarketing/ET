@@ -74,6 +74,23 @@
   font-weight: 500;
 }
 
+.productSelect {
+  padding: 10px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.productSelect:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 @media (max-width: 480px) {
   .lineNumbers { gap: 6px; }
   .lineTotal { font-size: 14px; min-width: 50px; }

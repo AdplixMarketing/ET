@@ -24,6 +24,7 @@ import InvoiceView from './pages/InvoiceView';
 import Clients from './pages/Clients';
 import ClientForm from './pages/ClientForm';
 import ClientView from './pages/ClientView';
+import Products from './pages/Products';
 
 // Lazy-loaded Max-tier pages
 const Recurring = lazy(() => import('./pages/Recurring'));
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="/clients/new" element={<ClientForm />} />
           <Route path="/clients/:id" element={<ClientView />} />
           <Route path="/clients/:id/edit" element={<ClientForm />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/recurring" element={<Recurring />} />
           <Route path="/recurring/new" element={<RecurringForm />} />
           <Route path="/recurring/:id" element={<RecurringForm />} />
